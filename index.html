@@ -830,11 +830,11 @@
             try {
                 // Load all data files
                 const [equityCurve, trades, metrics, state, positions] = await Promise.all([
-                    fetchCSV('data/data_equity_curve.csv'),
-                    fetchCSV('data/data_trades.csv'),
-                    fetch('data/data_metrics.json').then(r => r.json()),
-                    fetch('data/data_state.json').then(r => r.json()),
-                    fetch('data/data_positions.json').then(r => r.json())
+                    fetchCSV('data/equity_curve.csv'),
+                    fetchCSV('data/trades.csv'),
+                    fetch('data/metrics.json').then(r => r.json()),
+                    fetch('data/state.json').then(r => r.json()),
+                    fetch('data/positions.json').then(r => r.json())
                 ]);
 
                 // Update metrics
