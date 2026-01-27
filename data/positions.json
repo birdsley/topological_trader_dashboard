@@ -1,36 +1,36 @@
 {
-  "ANET": {
-    "shares": 4.2307206502749475,
-    "entry_price": 127.31545891571045,
-    "entry_date": "2026-01-21",
+  "AKAM": {
+    "shares": 13.017114651223757,
+    "entry_price": 95.0990178314209,
+    "entry_date": "2026-01-23",
     "signal": 1,
     "side": 1
   },
-  "ABT": {
-    "shares": 12.314815490035285,
-    "entry_price": 108.63172261047363,
-    "entry_date": "2026-01-22",
+  "APH": {
+    "shares": -5.605239613331924,
+    "entry_price": 166.21675,
+    "entry_date": "2026-01-27",
+    "signal": -1,
+    "side": -1
+  },
+  "BF-B": {
+    "shares": 48.42533358591595,
+    "entry_price": 26.775354457855222,
+    "entry_date": "2026-01-27",
     "signal": 1,
     "side": 1
   },
-  "FITB": {
-    "shares": 18.76307646474148,
-    "entry_price": 50.90017738952637,
-    "entry_date": "2026-01-22",
+  "DLTR": {
+    "shares": 10.708144721148727,
+    "entry_price": 121.86436433715821,
+    "entry_date": "2026-01-27",
     "signal": 1,
     "side": 1
   },
-  "HBAN": {
-    "shares": 75.82268504351438,
-    "entry_price": 17.643527389526366,
-    "entry_date": "2026-01-22",
-    "signal": 1,
-    "side": 1
-  },
-  "MKC": {
-    "shares": 21.854772895673705,
-    "entry_price": 61.21224076309204,
-    "entry_date": "2026-01-22",
+  "FDS": {
+    "shares": 4.8685192784860245,
+    "entry_price": 268.71373566284177,
+    "entry_date": "2026-01-27",
     "signal": 1,
     "side": 1
   }
