@@ -1,11 +1,4 @@
 {
-  "AKAM": {
-    "shares": 13.017114651223757,
-    "entry_price": 95.0990178314209,
-    "entry_date": "2026-01-23",
-    "signal": 1,
-    "side": 1
-  },
   "APH": {
     "shares": -5.605239613331924,
     "entry_price": 166.21675,
@@ -13,24 +6,31 @@
     "signal": -1,
     "side": -1
   },
-  "BF-B": {
-    "shares": 48.42533358591595,
-    "entry_price": 26.775354457855222,
-    "entry_date": "2026-01-27",
+  "ADI": {
+    "shares": -2.754453281044581,
+    "entry_price": 317.56147500000003,
+    "entry_date": "2026-01-28",
+    "signal": -1,
+    "side": -1
+  },
+  "AMGN": {
+    "shares": 2.767889683434586,
+    "entry_price": 342.28844522094727,
+    "entry_date": "2026-01-28",
     "signal": 1,
     "side": 1
   },
-  "DLTR": {
-    "shares": 10.708144721148727,
-    "entry_price": 121.86436433715821,
-    "entry_date": "2026-01-27",
+  "AWK": {
+    "shares": 10.913787571408688,
+    "entry_price": 127.07541305236816,
+    "entry_date": "2026-01-28",
     "signal": 1,
     "side": 1
   },
-  "FDS": {
-    "shares": 4.8685192784860245,
-    "entry_price": 268.71373566284177,
-    "entry_date": "2026-01-27",
+  "CLX": {
+    "shares": 13.261474252882923,
+    "entry_price": 108.82176305236815,
+    "entry_date": "2026-01-28",
     "signal": 1,
     "side": 1
   }
