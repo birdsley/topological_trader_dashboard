@@ -6,31 +6,31 @@
     "signal": -1,
     "side": -1
   },
-  "ADI": {
-    "shares": -2.754453281044581,
-    "entry_price": 317.56147500000003,
-    "entry_date": "2026-01-28",
-    "signal": -1,
-    "side": -1
-  },
-  "AMGN": {
-    "shares": 2.767889683434586,
-    "entry_price": 342.28844522094727,
-    "entry_date": "2026-01-28",
+  "ADSK": {
+    "shares": 5.26057014023669,
+    "entry_price": 255.7311286743164,
+    "entry_date": "2026-01-29",
     "signal": 1,
     "side": 1
   },
-  "AWK": {
-    "shares": 10.913787571408688,
-    "entry_price": 127.07541305236816,
-    "entry_date": "2026-01-28",
+  "CDNS": {
+    "shares": 4.391393835679971,
+    "entry_price": 302.7305474304199,
+    "entry_date": "2026-01-29",
     "signal": 1,
     "side": 1
   },
-  "CLX": {
-    "shares": 13.261474252882923,
-    "entry_price": 108.82176305236815,
-    "entry_date": "2026-01-28",
+  "GDDY": {
+    "shares": 13.512602274206001,
+    "entry_price": 99.25984586334228,
+    "entry_date": "2026-01-29",
+    "signal": 1,
+    "side": 1
+  },
+  "GEN": {
+    "shares": 57.4939696644688,
+    "entry_price": 23.90477961845398,
+    "entry_date": "2026-01-29",
     "signal": 1,
     "side": 1
   }
