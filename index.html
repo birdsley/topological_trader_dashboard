@@ -1061,7 +1061,7 @@
                                 return gradient;
                             },
                             borderWidth: 2,
-                            fill: true,
+                            fill: false,
                             tension: 0.4,
                             pointRadius: 0,
                             pointHoverRadius: 4
@@ -1072,7 +1072,7 @@
                             borderColor: '#ff9f43',
                             backgroundColor: 'transparent',
                             borderWidth: 2,
-                            fill: True,
+                            fill: false,
                             tension: 0.4,
                             pointRadius: 0,
                             pointHoverRadius: 4
@@ -1106,7 +1106,7 @@
                     scales: {
                         x: {
                             grid: {
-                                color: '#1a1a1a',
+                                color: '#1f1f1f',
                                 drawBorder: false
                             },
                             ticks: {
@@ -1119,8 +1119,17 @@
                         },
                         y: {
                             grid: {
-                                color: '#1a1a1a',
-                                drawBorder: false
+                                drawBorder: false,
+                                color: function(context) {
+                                    // Bold zero line
+                                    if (context.tick.value === 0) {
+                                        return '#444';
+                                    }
+                                    return '#1a1a1a';
+                                },
+                                lineWidth: function(context) {
+                                    return context.tick.value === 0 ? 2 : 1;
+                                }
                             },
                             ticks: {
                                 color: '#808080',
