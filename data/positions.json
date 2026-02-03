@@ -1,1 +1,30 @@
-{}
+{
+  "AES": {
+    "shares": -55.03,
+    "entry_price": 16.09,
+    "entry_date": "2026-02-03",
+    "signal": -1,
+    "side": -1
+  },
+  "BALL": {
+    "shares": -14.33,
+    "entry_price": 61.76,
+    "entry_date": "2026-02-03",
+    "signal": -1,
+    "side": -1
+  },
+  "MPC": {
+    "shares": -5.48,
+    "entry_price": 187.54,
+    "entry_date": "2026-02-03",
+    "signal": -1,
+    "side": -1
+  },
+  "VLO": {
+    "shares": -5.23,
+    "entry_price": 192.23,
+    "entry_date": "2026-02-03",
+    "signal": -1,
+    "side": -1
+  }
+}
