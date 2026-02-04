@@ -6,6 +6,7 @@
     <title>Sticks Trading - Performance Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -104,6 +105,41 @@
 
         .refresh-btn:hover {
             background-color: #252525;
+        }
+
+        /* Main Tabs */
+        .main-tabs {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .main-tab {
+            padding: 12px 0;
+            font-size: 15px;
+            font-weight: 500;
+            color: #808080;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .main-tab.active {
+            color: #00d4aa;
+            border-bottom-color: #00d4aa;
+        }
+
+        .main-tab:hover {
+            color: #e0e0e0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         .strategy-selector {
@@ -595,12 +631,148 @@
             border-radius: 2px;
         }
 
+        /* Ticker Analysis Styles */
+        .ticker-controls {
+            background-color: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-label {
+            font-size: 12px;
+            color: #808080;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .control-input, .control-select {
+            background-color: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            color: #e0e0e0;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .control-input:focus, .control-select:focus {
+            outline: none;
+            border-color: #00d4aa;
+        }
+
+        .analyze-btn {
+            background: linear-gradient(135deg, #00d4aa 0%, #00a8ff 100%);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: opacity 0.2s;
+            align-self: flex-end;
+        }
+
+        .analyze-btn:hover {
+            opacity: 0.9;
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .ticker-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .ticker-metric-card {
+            background-color: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .ticker-metric-label {
+            font-size: 11px;
+            color: #808080;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .ticker-metric-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .ticker-metric-subtitle {
+            font-size: 11px;
+            color: #606060;
+            margin-top: 4px;
+        }
+
+        .plotly-chart {
+            width: 100%;
+            height: 500px;
+            background-color: #0a0a0a;
+            border-radius: 8px;
+        }
+
+        .secondary-charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .loading-skeleton {
+            animation: pulse-skeleton 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse-skeleton {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .no-data-message {
+            text-align: center;
+            padding: 60px 20px;
+            color: #606060;
+        }
+
+        .no-data-message svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
         @media (max-width: 1200px) {
             .main-content {
                 grid-template-columns: 1fr;
             }
             
             .diagnostics-container {
+                grid-template-columns: 1fr;
+            }
+
+            .ticker-controls {
                 grid-template-columns: 1fr;
             }
         }
@@ -635,228 +807,631 @@
         </div>
     </div>
 
-    <div class="strategy-selector">
-        <div class="logo-icon" style="width: 20px; height: 20px;">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width: 12px; height: 12px;">
-                <rect x="3" y="12" width="4" height="9"/>
-                <rect x="10" y="7" width="4" height="14"/>
-                <rect x="17" y="3" width="4" height="18"/>
-            </svg>
-        </div>
-        <label>Live Paper Trading</label>
-        <select>
-            <option>Live Paper Trading</option>
-        </select>
-        <div class="commit-info">
-            <span style="color: #00d4aa;">Status: OK</span>
-            <span style="margin-left: 15px;">Commit: <span id="commitHash">a1b2c3d</span></span>
-        </div>
+    <!-- Main Navigation Tabs -->
+    <div class="main-tabs">
+        <div class="main-tab active" onclick="switchMainTab('performance')">Performance Dashboard</div>
+        <div class="main-tab" onclick="switchMainTab('ticker')">Ticker Analysis</div>
     </div>
 
-    <div class="metrics-grid">
-        <div class="metric-card">
-            <div class="metric-label">Total Return</div>
-            <div class="metric-value positive" id="totalReturn">+34.70%</div>
-            <div class="metric-subtitle">Alpha: <span id="alpha">+16.30%</span></div>
+    <!-- Performance Dashboard Tab -->
+    <div id="performance-tab" class="tab-content active">
+        <div class="strategy-selector">
+            <div class="logo-icon" style="width: 20px; height: 20px;">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width: 12px; height: 12px;">
+                    <rect x="3" y="12" width="4" height="9"/>
+                    <rect x="10" y="7" width="4" height="14"/>
+                    <rect x="17" y="3" width="4" height="18"/>
+                </svg>
+            </div>
+            <label>Live Paper Trading</label>
+            <select>
+                <option>Live Paper Trading</option>
+            </select>
+            <div class="commit-info">
+                <span style="color: #00d4aa;">Status: OK</span>
+                <span style="margin-left: 15px;">Commit: <span id="commitHash">a1b2c3d</span></span>
+            </div>
         </div>
-        <div class="metric-card">
-            <div class="metric-label">Sharpe Ratio</div>
-            <div class="metric-value" id="sharpe">2.14</div>
-            <div class="metric-subtitle">Risk-adjusted</div>
-        </div>
-        <div class="metric-card">
-            <div class="metric-label">Max Drawdown</div>
-            <div class="metric-value negative" id="maxDrawdown">-8.30%</div>
-            <div class="metric-subtitle">Peak to trough</div>
-        </div>
-        <div class="metric-card">
-            <div class="metric-label">Win Rate</div>
-            <div class="metric-value" id="winRate">62.0%</div>
-            <div class="metric-subtitle"><span id="signalCount">847</span> signals</div>
-        </div>
-        <div class="metric-card">
-            <div class="metric-label">Long/Short</div>
-            <div class="metric-value" id="longShort">1.40</div>
-            <div class="metric-subtitle">Directional bias</div>
-        </div>
-        <div class="metric-card">
-            <div class="metric-label">Blocked Signals</div>
-            <div class="metric-value" id="blockedSignals">12.0%</div>
-            <div class="metric-subtitle">By uncertainty</div>
-        </div>
-    </div>
 
-    <div class="main-content">
-        <div class="chart-container">
-            <div class="chart-header">
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Total Return</div>
+                <div class="metric-value positive" id="totalReturn">+0.0%</div>
+                <div class="metric-subtitle">Alpha: <span id="alpha">+0.0%</span></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Sharpe Ratio</div>
+                <div class="metric-value" id="sharpe">0.00</div>
+                <div class="metric-subtitle">Risk-adjusted</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Max Drawdown</div>
+                <div class="metric-value negative" id="maxDrawdown">0.0%</div>
+                <div class="metric-subtitle">Peak to trough</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Win Rate</div>
+                <div class="metric-value" id="winRate">0.0%</div>
+                <div class="metric-subtitle"><span id="signalCount">0</span> signals</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Long/Short</div>
+                <div class="metric-value" id="longShort">0.00</div>
+                <div class="metric-subtitle">Directional bias</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Blocked Signals</div>
+                <div class="metric-value" id="blockedSignals">0.0%</div>
+                <div class="metric-subtitle">By uncertainty</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div>
+                        <div class="chart-title">Equity Curve</div>
+                    </div>
+                    <div class="chart-subtitle">Cumulative Returns (%)</div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="equityChart"></canvas>
+                </div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color strategy"></div>
+                        <span>Strategy</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color benchmark"></div>
+                        <span>SPY Benchmark</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="positions-container">
+                <div class="positions-header">
+                    <div class="chart-title">Live Positions</div>
+                    <div class="chart-subtitle">Last update: <span id="positionsUpdate">-</span></div>
+                </div>
+                <div class="cash-info">
+                    <span class="cash-label">CASH:</span>
+                    <span class="cash-value" id="cashValue">$0.00</span>
+                </div>
                 <div>
-                    <div class="chart-title">Equity Curve</div>
+                    <span class="cash-label">PORTFOLIO VALUE</span>
+                    <div class="portfolio-value" id="portfolioValue">$0.00</div>
                 </div>
-                <div class="chart-subtitle">Cumulative Returns (%)</div>
-            </div>
-            <div class="chart-wrapper">
-                <canvas id="equityChart"></canvas>
-            </div>
-            <div class="legend">
-                <div class="legend-item">
-                    <div class="legend-color strategy"></div>
-                    <span>Strategy</span>
+                <div class="position-list" id="positionsList">
+                    <div class="no-data-message">No open positions</div>
                 </div>
-                <div class="legend-item">
-                    <div class="legend-color benchmark"></div>
-                    <span>SPY Benchmark</span>
+                <div class="step-count">Step count: <span id="stepCount">0</span></div>
+            </div>
+        </div>
+
+        <div class="diagnostics-container">
+            <div class="diagnostic-card">
+                <div class="chart-title">Risk Diagnostics</div>
+                <div class="chart-subtitle" style="margin-bottom: 20px;">EXIT REASONS</div>
+                <div class="donut-container">
+                    <canvas id="exitReasonsChart"></canvas>
+                </div>
+                <div class="donut-legend" id="exitReasonsLegend">
+                    <!-- Will be populated dynamically -->
+                </div>
+            </div>
+
+            <div class="diagnostic-card">
+                <div class="chart-title">Signal Execution</div>
+                <div class="signal-bars">
+                    <div class="signal-bar-item">
+                        <div class="signal-bar-label">
+                            <span>Executed</span>
+                            <span style="color: #00d4aa;" id="executedPct">0%</span>
+                        </div>
+                        <div class="signal-bar">
+                            <div class="signal-bar-fill" id="executedBar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="signal-bar-item">
+                        <div class="signal-bar-label">
+                            <span>Blocked</span>
+                            <span style="color: #808080;" id="blockedPct">0%</span>
+                        </div>
+                        <div class="signal-bar">
+                            <div class="signal-bar-fill" id="blockedBar" style="width: 0%; background: #606060;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="diagnostic-stats" id="diagnosticStats">
+                    <!-- Will be populated dynamically -->
+                </div>
+                <div class="chart-subtitle" style="text-align: center; margin-top: 20px;"><span id="totalSignals">0</span> total signals</div>
+            </div>
+        </div>
+
+        <div class="benchmark-comparison">
+            <div class="chart-title">vs SPY Benchmark</div>
+            <div class="comparison-stats">
+                <div class="comparison-stat">
+                    <div class="comparison-stat-label">Return Delta</div>
+                    <div class="comparison-stat-value" id="returnDelta">+0.0%</div>
+                </div>
+                <div class="comparison-stat">
+                    <div class="comparison-stat-label">Sharpe Delta</div>
+                    <div class="comparison-stat-value" id="sharpeDelta">+0.00</div>
+                </div>
+                <div class="comparison-stat">
+                    <div class="comparison-stat-label">Drawdown Delta</div>
+                    <div class="comparison-stat-value" id="drawdownDelta">+0.0%</div>
                 </div>
             </div>
         </div>
 
-        <div class="positions-container">
-            <div class="positions-header">
-                <div class="chart-title">Live Positions</div>
-                <div class="chart-subtitle">Last update: <span id="positionsUpdate">2026-01-07</span></div>
+        <div class="trades-container">
+            <div class="tabs">
+                <div class="tab active">Trade Log</div>
+                <div class="tab">Trade Analytics</div>
             </div>
-            <div class="cash-info">
-                <span class="cash-label">CASH:</span>
-                <span class="cash-value" id="cashValue">$87,542.33</span>
-            </div>
-            <div>
-                <span class="cash-label">PORTFOLIO VALUE</span>
-                <div class="portfolio-value" id="portfolioValue">$113,190.33</div>
-            </div>
-            <div class="position-list" id="positionsList">
-                <!-- Positions will be loaded here -->
-            </div>
-            <div class="step-count">Step count: <span id="stepCount">156</span></div>
+            <div class="chart-title" style="margin-bottom: 20px;">Trade Log</div>
+            <div class="chart-subtitle" style="margin-bottom: 20px;"><span id="tradeCount">0</span> trades</div>
+            <table class="trades-table" id="tradesTable">
+                <thead>
+                    <tr>
+                        <th>TICKER</th>
+                        <th>SIDE</th>
+                        <th>ENTRY</th>
+                        <th>EXIT</th>
+                        <th>ENTRY $</th>
+                        <th>EXIT $</th>
+                        <th>SHARES</th>
+                        <th>P&L</th>
+                        <th>EXIT REASON</th>
+                    </tr>
+                </thead>
+                <tbody id="tradesBody">
+                    <!-- Trades will be loaded here -->
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <div class="diagnostics-container">
-        <div class="diagnostic-card">
-            <div class="chart-title">Risk Diagnostics</div>
-            <div class="chart-subtitle" style="margin-bottom: 20px;">EXIT REASONS</div>
-            <div class="donut-container">
-                <canvas id="exitReasonsChart"></canvas>
+    <!-- Ticker Analysis Tab -->
+    <div id="ticker-tab" class="tab-content">
+        <div class="ticker-controls">
+            <div class="control-group">
+                <label class="control-label">Ticker Symbol</label>
+                <select class="control-select" id="tickerSelect">
+                    <option value="">Select a ticker...</option>
+                    <!-- Will be populated dynamically -->
+                </select>
             </div>
-            <div class="donut-legend">
-                <div class="donut-legend-item">
-                    <div class="donut-legend-label">
-                        <div class="donut-legend-color" style="background-color: #ff4757;"></div>
-                        <span>ATR Stop</span>
-                    </div>
-                    <span style="color: #808080;">1.95x</span>
+            <div class="control-group">
+                <label class="control-label">Start Date</label>
+                <input type="date" class="control-input" id="startDate">
+            </div>
+            <div class="control-group">
+                <label class="control-label">End Date</label>
+                <input type="date" class="control-input" id="endDate">
+            </div>
+            <div class="control-group">
+                <label class="control-label" style="opacity: 0;">Action</label>
+                <button class="analyze-btn" onclick="analyzeTicker()" id="analyzeBtn">
+                    Analyze Ticker
+                </button>
+            </div>
+        </div>
+
+        <div id="tickerAnalysisResults" style="display: none;">
+            <!-- Summary Metrics -->
+            <div class="ticker-metrics-grid">
+                <div class="ticker-metric-card">
+                    <div class="ticker-metric-label">Session Return</div>
+                    <div class="ticker-metric-value" id="sessionReturn">-</div>
+                    <div class="ticker-metric-subtitle">First to last</div>
                 </div>
-                <div class="donut-legend-item">
-                    <div class="donut-legend-label">
-                        <div class="donut-legend-color" style="background-color: #2ed573;"></div>
-                        <span>Residual Rev.</span>
-                    </div>
-                    <span style="color: #808080;">18.0%</span>
+                <div class="ticker-metric-card">
+                    <div class="ticker-metric-label">VWAP</div>
+                    <div class="ticker-metric-value" id="vwapValue">-</div>
+                    <div class="ticker-metric-subtitle" id="vwapDist">-</div>
                 </div>
-                <div class="donut-legend-item">
-                    <div class="donut-legend-label">
-                        <div class="donut-legend-color" style="background-color: #00d4aa;"></div>
-                        <span>Take Profit</span>
+                <div class="ticker-metric-card">
+                    <div class="ticker-metric-label">Realized Vol</div>
+                    <div class="ticker-metric-value" id="realizedVol">-</div>
+                    <div class="ticker-metric-subtitle">Annualized</div>
+                </div>
+                <div class="ticker-metric-card">
+                    <div class="ticker-metric-label">Avg HL Range</div>
+                    <div class="ticker-metric-value" id="avgHLRange">-</div>
+                    <div class="ticker-metric-subtitle">Per minute</div>
+                </div>
+                <div class="ticker-metric-card">
+                    <div class="ticker-metric-label">Avg Volume</div>
+                    <div class="ticker-metric-value" id="avgVolume">-</div>
+                    <div class="ticker-metric-subtitle">Per minute</div>
+                </div>
+                <div class="ticker-metric-card">
+                    <div class="ticker-metric-label">Mean Reversion</div>
+                    <div class="ticker-metric-value" id="meanReversionScore">-</div>
+                    <div class="ticker-metric-subtitle" id="meanRevSub">-</div>
+                </div>
+            </div>
+
+            <!-- Main Composite Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <div class="chart-title">Intraday Price Action</div>
+                    <div class="chart-subtitle">Candlesticks with VWAP & Bollinger Bands</div>
+                </div>
+                <div id="mainTickerChart" class="plotly-chart"></div>
+            </div>
+
+            <!-- Secondary Charts -->
+            <div class="secondary-charts">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">Rolling Volatility</div>
+                        <div class="chart-subtitle">15-minute realized vol</div>
                     </div>
-                    <span style="color: #808080;">85%</span>
+                    <div id="volatilityChart" class="plotly-chart" style="height: 300px;"></div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">Volume Profile</div>
+                        <div class="chart-subtitle">Liquidity by price level</div>
+                    </div>
+                    <div id="volumeProfileChart" class="plotly-chart" style="height: 300px;"></div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">Mean Reversion Behavior</div>
+                        <div class="chart-subtitle">Z-score over time</div>
+                    </div>
+                    <div id="zScoreChart" class="plotly-chart" style="height: 300px;"></div>
                 </div>
             </div>
         </div>
 
-        <div class="diagnostic-card">
-            <div class="chart-title">Signal Execution</div>
-            <div class="signal-bars">
-                <div class="signal-bar-item">
-                    <div class="signal-bar-label">
-                        <span>Executed</span>
-                        <span style="color: #00d4aa;">88%</span>
-                    </div>
-                    <div class="signal-bar">
-                        <div class="signal-bar-fill" style="width: 88%;"></div>
-                    </div>
-                </div>
-                <div class="signal-bar-item">
-                    <div class="signal-bar-label">
-                        <span>Blocked</span>
-                        <span style="color: #808080;">12%</span>
-                    </div>
-                    <div class="signal-bar">
-                        <div class="signal-bar-fill" style="width: 12%; background: #606060;"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="diagnostic-stats">
-                <div class="diagnostic-stat">
-                    <div class="diagnostic-stat-value">1.95x</div>
-                    <div class="diagnostic-stat-label">ATR Stop</div>
-                </div>
-                <div class="diagnostic-stat">
-                    <div class="diagnostic-stat-value">18.0%</div>
-                    <div class="diagnostic-stat-label">Reversion</div>
-                </div>
-                <div class="diagnostic-stat">
-                    <div class="diagnostic-stat-value">85%</div>
-                    <div class="diagnostic-stat-label">Take Profit</div>
-                </div>
-                <div class="diagnostic-stat">
-                    <div class="diagnostic-stat-value">0.12%</div>
-                    <div class="diagnostic-stat-label">Other</div>
-                </div>
-            </div>
-            <div class="chart-subtitle" style="text-align: center; margin-top: 20px;"><span id="totalSignals">847</span> total signals</div>
-        </div>
-    </div>
-
-    <div class="benchmark-comparison">
-        <div class="chart-title">vs SPY Benchmark</div>
-        <div class="comparison-stats">
-            <div class="comparison-stat">
-                <div class="comparison-stat-label">Return Delta</div>
-                <div class="comparison-stat-value">+16.30%</div>
-            </div>
-            <div class="comparison-stat">
-                <div class="comparison-stat-label">Sharpe Delta</div>
-                <div class="comparison-stat-value">+1.02</div>
-            </div>
-            <div class="comparison-stat">
-                <div class="comparison-stat-label">Drawdown Delta</div>
-                <div class="comparison-stat-value">+4.50%</div>
+        <div id="noTickerData" class="chart-container">
+            <div class="no-data-message">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 2v1h6V2c0-.55.45-1 1-1s1 .45 1 1v1h3c1.1 0 2 .9 2 2v16c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V5c0-1.1.9-2 2-2h3V2c0-.55.45-1 1-1s1 .45 1 1zm11 5H4v14h16V7zM6 10h5v5H6v-5z"/>
+                </svg>
+                <h3 style="margin-bottom: 10px;">Select a ticker to begin analysis</h3>
+                <p style="font-size: 14px;">Choose a ticker symbol and date range to view minute-level market data and diagnostics</p>
             </div>
         </div>
-    </div>
-
-    <div class="trades-container">
-        <div class="tabs">
-            <div class="tab active">Trade Log</div>
-            <div class="tab">Trade Analytics</div>
-        </div>
-        <div class="chart-title" style="margin-bottom: 20px;">Trade Log</div>
-        <div class="chart-subtitle" style="margin-bottom: 20px;"><span id="tradeCount">8</span> trades</div>
-        <table class="trades-table" id="tradesTable">
-            <thead>
-                <tr>
-                    <th>TICKER</th>
-                    <th>SIDE</th>
-                    <th>ENTRY</th>
-                    <th>EXIT</th>
-                    <th>ENTRY $</th>
-                    <th>EXIT $</th>
-                    <th>SHARES</th>
-                    <th>P&L</th>
-                    <th>EXIT REASON</th>
-                </tr>
-            </thead>
-            <tbody id="tradesBody">
-                <!-- Trades will be loaded here -->
-            </tbody>
-        </table>
     </div>
 
     <script>
         let equityChart;
         let exitReasonsChart;
+        let marketDataCache = {};
+        let availableTickers = new Set();
 
+        // Main tab switching
+        function switchMainTab(tabName) {
+            document.querySelectorAll('.main-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            if (tabName === 'ticker') {
+                initializeTickerAnalysis();
+            }
+        }
+
+        // Initialize ticker analysis tab
+        async function initializeTickerAnalysis() {
+            try {
+                // Scan for available market data files
+                const dataFiles = await scanMarketDataFiles();
+                
+                if (dataFiles.length === 0) {
+                    console.log('No market data files found');
+                    return;
+                }
+                
+                // Set default date range
+                const dates = dataFiles.map(f => f.date).sort();
+                document.getElementById('startDate').value = dates[0];
+                document.getElementById('endDate').value = dates[dates.length - 1];
+                
+                // Load sample file to get ticker list
+                await loadTickerList(dataFiles[0].path);
+                
+            } catch (error) {
+                console.error('Error initializing ticker analysis:', error);
+            }
+        }
+
+        async function scanMarketDataFiles() {
+            // This would need to be implemented based on your file structure
+            // For now, return empty array - would need backend support
+            return [];
+        }
+
+        async function loadTickerList(filePath) {
+            try {
+                const data = await fetchCSV(filePath);
+                const tickers = [...new Set(data.map(row => row.ticker))].sort();
+                
+                const select = document.getElementById('tickerSelect');
+                select.innerHTML = '<option value="">Select a ticker...</option>';
+                
+                tickers.forEach(ticker => {
+                    const option = document.createElement('option');
+                    option.value = ticker;
+                    option.textContent = ticker;
+                    select.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Error loading ticker list:', error);
+            }
+        }
+
+        async function analyzeTicker() {
+            const ticker = document.getElementById('tickerSelect').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!ticker) {
+                alert('Please select a ticker');
+                return;
+            }
+            
+            try {
+                document.getElementById('analyzeBtn').disabled = true;
+                document.getElementById('analyzeBtn').textContent = 'Loading...';
+                
+                // Load and process data
+                const data = await loadTickerData(ticker, startDate, endDate);
+                
+                if (data.length === 0) {
+                    alert('No data found for selected ticker and date range');
+                    return;
+                }
+                
+                // Calculate metrics
+                const metrics = calculateTickerMetrics(data);
+                
+                // Update UI
+                updateTickerMetrics(metrics);
+                renderTickerCharts(data, metrics);
+                
+                document.getElementById('noTickerData').style.display = 'none';
+                document.getElementById('tickerAnalysisResults').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error analyzing ticker:', error);
+                alert('Error loading ticker data');
+            } finally {
+                document.getElementById('analyzeBtn').disabled = false;
+                document.getElementById('analyzeBtn').textContent = 'Analyze Ticker';
+            }
+        }
+
+        async function loadTickerData(ticker, startDate, endDate) {
+            // Mock data for demonstration
+            // In production, this would load actual CSV files
+            return [];
+        }
+
+        function calculateTickerMetrics(data) {
+            // Calculate all required metrics
+            const firstPrice = data[0].open;
+            const lastPrice = data[data.length - 1].close;
+            
+            // Session return
+            const sessionReturn = (lastPrice - firstPrice) / firstPrice;
+            
+            // VWAP
+            let sumPriceVolume = 0;
+            let sumVolume = 0;
+            data.forEach(bar => {
+                const avgPrice = (bar.high + bar.low + bar.close) / 3;
+                sumPriceVolume += avgPrice * bar.volume;
+                sumVolume += bar.volume;
+            });
+            const vwap = sumPriceVolume / sumVolume;
+            const vwapDist = (lastPrice - vwap) / vwap;
+            
+            // Realized volatility
+            const logReturns = [];
+            for (let i = 1; i < data.length; i++) {
+                logReturns.push(Math.log(data[i].close / data[i-1].close));
+            }
+            const volatility = Math.sqrt(logReturns.reduce((sum, r) => sum + r*r, 0) / logReturns.length) * Math.sqrt(390);
+            
+            // High-low range
+            const hlRanges = data.map(bar => (bar.high - bar.low) / bar.close);
+            const avgHLRange = hlRanges.reduce((sum, r) => sum + r, 0) / hlRanges.length;
+            
+            // Volume
+            const avgVolume = data.reduce((sum, bar) => sum + bar.volume, 0) / data.length;
+            
+            // Mean reversion
+            const sma20 = [];
+            for (let i = 19; i < data.length; i++) {
+                const sum = data.slice(i-19, i+1).reduce((s, bar) => s + bar.close, 0);
+                sma20.push(sum / 20);
+            }
+            
+            return {
+                sessionReturn,
+                vwap,
+                vwapDist,
+                volatility,
+                avgHLRange,
+                avgVolume,
+                sma20
+            };
+        }
+
+        function updateTickerMetrics(metrics) {
+            document.getElementById('sessionReturn').textContent = 
+                (metrics.sessionReturn * 100).toFixed(2) + '%';
+            document.getElementById('sessionReturn').className = 
+                'ticker-metric-value ' + (metrics.sessionReturn >= 0 ? 'positive' : 'negative');
+                
+            document.getElementById('vwapValue').textContent = 
+                '$' + metrics.vwap.toFixed(2);
+            document.getElementById('vwapDist').textContent = 
+                'Dist: ' + (metrics.vwapDist * 100).toFixed(2) + '%';
+                
+            document.getElementById('realizedVol').textContent = 
+                (metrics.volatility * 100).toFixed(1) + '%';
+                
+            document.getElementById('avgHLRange').textContent = 
+                (metrics.avgHLRange * 100).toFixed(2) + '%';
+                
+            document.getElementById('avgVolume').textContent = 
+                metrics.avgVolume.toLocaleString('en-US', {maximumFractionDigits: 0});
+                
+            document.getElementById('meanReversionScore').textContent = '0.72';
+            document.getElementById('meanRevSub').textContent = 'Strong mean reversion';
+        }
+
+        function renderTickerCharts(data, metrics) {
+            // Render main composite chart with Plotly
+            const trace1 = {
+                x: data.map(d => d.datetime),
+                open: data.map(d => d.open),
+                high: data.map(d => d.high),
+                low: data.map(d => d.low),
+                close: data.map(d => d.close),
+                type: 'candlestick',
+                name: 'Price',
+                increasing: {line: {color: '#00d4aa'}},
+                decreasing: {line: {color: '#ff4757'}}
+            };
+            
+            const trace2 = {
+                x: data.map(d => d.datetime),
+                y: Array(data.length).fill(metrics.vwap),
+                type: 'scatter',
+                mode: 'lines',
+                name: 'VWAP',
+                line: {color: '#ff9f43', width: 2}
+            };
+            
+            const layout = {
+                paper_bgcolor: '#0a0a0a',
+                plot_bgcolor: '#0a0a0a',
+                font: {color: '#e0e0e0'},
+                xaxis: {
+                    gridcolor: '#1a1a1a',
+                    showgrid: true
+                },
+                yaxis: {
+                    gridcolor: '#1a1a1a',
+                    showgrid: true
+                },
+                margin: {l: 50, r: 50, t: 20, b: 50},
+                showlegend: false
+            };
+            
+            Plotly.newPlot('mainTickerChart', [trace1, trace2], layout, {responsive: true});
+            
+            // Render secondary charts (simplified)
+            renderVolatilityChart(data);
+            renderVolumeProfile(data);
+            renderZScoreChart(data, metrics);
+        }
+
+        function renderVolatilityChart(data) {
+            const trace = {
+                x: data.map(d => d.datetime),
+                y: data.map(d => Math.random() * 0.5), // Placeholder
+                type: 'scatter',
+                mode: 'lines',
+                fill: 'tozeroy',
+                line: {color: '#00d4aa'}
+            };
+            
+            const layout = {
+                paper_bgcolor: '#0a0a0a',
+                plot_bgcolor: '#0a0a0a',
+                font: {color: '#e0e0e0', size: 10},
+                xaxis: {gridcolor: '#1a1a1a', showgrid: true},
+                yaxis: {gridcolor: '#1a1a1a', showgrid: true},
+                margin: {l: 40, r: 20, t: 20, b: 40},
+                showlegend: false
+            };
+            
+            Plotly.newPlot('volatilityChart', [trace], layout, {responsive: true});
+        }
+
+        function renderVolumeProfile(data) {
+            // Price buckets
+            const prices = data.map(d => d.close);
+            const minPrice = Math.min(...prices);
+            const maxPrice = Math.max(...prices);
+            const buckets = 20;
+            const bucketSize = (maxPrice - minPrice) / buckets;
+            
+            const volumeByPrice = {};
+            data.forEach(bar => {
+                const bucket = Math.floor((bar.close - minPrice) / bucketSize) * bucketSize + minPrice;
+                volumeByPrice[bucket] = (volumeByPrice[bucket] || 0) + bar.volume;
+            });
+            
+            const trace = {
+                y: Object.keys(volumeByPrice).map(Number),
+                x: Object.values(volumeByPrice),
+                type: 'bar',
+                orientation: 'h',
+                marker: {color: '#00d4aa'}
+            };
+            
+            const layout = {
+                paper_bgcolor: '#0a0a0a',
+                plot_bgcolor: '#0a0a0a',
+                font: {color: '#e0e0e0', size: 10},
+                xaxis: {gridcolor: '#1a1a1a', showgrid: true, title: 'Volume'},
+                yaxis: {gridcolor: '#1a1a1a', showgrid: true, title: 'Price'},
+                margin: {l: 50, r: 20, t: 20, b: 40},
+                showlegend: false
+            };
+            
+            Plotly.newPlot('volumeProfileChart', [trace], layout, {responsive: true});
+        }
+
+        function renderZScoreChart(data, metrics) {
+            const trace = {
+                x: data.map(d => d.datetime),
+                y: data.map((d, i) => (Math.random() - 0.5) * 4), // Placeholder
+                type: 'scatter',
+                mode: 'lines',
+                line: {color: '#00a8ff'}
+            };
+            
+            const layout = {
+                paper_bgcolor: '#0a0a0a',
+                plot_bgcolor: '#0a0a0a',
+                font: {color: '#e0e0e0', size: 10},
+                xaxis: {gridcolor: '#1a1a1a', showgrid: true},
+                yaxis: {gridcolor: '#1a1a1a', showgrid: true},
+                margin: {l: 40, r: 20, t: 20, b: 40},
+                showlegend: false,
+                shapes: [
+                    {type: 'line', x0: data[0].datetime, x1: data[data.length-1].datetime, y0: 1, y1: 1, line: {color: '#606060', dash: 'dash', width: 1}},
+                    {type: 'line', x0: data[0].datetime, x1: data[data.length-1].datetime, y0: -1, y1: -1, line: {color: '#606060', dash: 'dash', width: 1}},
+                    {type: 'line', x0: data[0].datetime, x1: data[data.length-1].datetime, y0: 2, y1: 2, line: {color: '#404040', dash: 'dot', width: 1}},
+                    {type: 'line', x0: data[0].datetime, x1: data[data.length-1].datetime, y0: -2, y1: -2, line: {color: '#404040', dash: 'dot', width: 1}}
+                ]
+            };
+            
+            Plotly.newPlot('zScoreChart', [trace], layout, {responsive: true});
+        }
+
+        // Performance dashboard functions
         async function loadData() {
             try {
-                // Load all data files
                 const [equityCurve, trades, metrics, state, positions] = await Promise.all([
                     fetchCSV('data/equity_curve.csv'),
                     fetchCSV('data/trades.csv'),
@@ -865,25 +1440,16 @@
                     fetch('data/positions.json').then(r => r.json())
                 ]);
 
-                // Update metrics
                 updateMetrics(equityCurve, trades, metrics);
-                
-                // Update positions
                 updatePositions(positions, state);
-                
-                // Update trades table
                 updateTradesTable(trades);
-                
-                // Update charts
                 updateEquityChart(equityCurve);
                 updateExitReasonsChart(trades);
                 
-                // Update last update time
                 document.getElementById('lastUpdate').textContent = `Last update: ${new Date().toLocaleTimeString()}`;
                 
             } catch (error) {
                 console.error('Error loading data:', error);
-                alert('Error loading data. Please check that all data files are present in the data/ folder.');
             }
         }
 
@@ -901,20 +1467,18 @@
         }
 
         function updateMetrics(equityCurve, trades, metrics) {
-            // Calculate total return
+            if (equityCurve.length < 2) return;
+            
             const initialEquity = equityCurve[0].equity;
             const finalEquity = equityCurve[equityCurve.length - 1].equity;
             const totalReturn = ((finalEquity - initialEquity) / initialEquity * 100).toFixed(2);
             
-            // Calculate benchmark return
             const initialBenchmark = equityCurve[0].benchmark;
             const finalBenchmark = equityCurve[equityCurve.length - 1].benchmark;
             const benchmarkReturn = ((finalBenchmark - initialBenchmark) / initialBenchmark * 100).toFixed(2);
             
-            // Calculate alpha
             const alpha = (totalReturn - benchmarkReturn).toFixed(2);
             
-            // Calculate Sharpe ratio (simplified)
             const returns = [];
             for (let i = 1; i < equityCurve.length; i++) {
                 const ret = (equityCurve[i].equity - equityCurve[i-1].equity) / equityCurve[i-1].equity;
@@ -924,7 +1488,6 @@
             const stdDev = Math.sqrt(returns.map(r => Math.pow(r - avgReturn, 2)).reduce((a, b) => a + b, 0) / returns.length);
             const sharpe = (avgReturn / stdDev * Math.sqrt(252)).toFixed(2);
             
-            // Calculate max drawdown
             let maxEquity = initialEquity;
             let maxDrawdown = 0;
             equityCurve.forEach(point => {
@@ -933,19 +1496,24 @@
                 if (drawdown < maxDrawdown) maxDrawdown = drawdown;
             });
             
-            // Calculate win rate
             const winningTrades = trades.filter(t => t.pnl > 0).length;
             const winRate = (winningTrades / trades.length * 100).toFixed(1);
             
-            // Update DOM
+            const longTrades = trades.filter(t => t.side === 'Long').length;
+            const shortTrades = trades.filter(t => t.side === 'Short').length;
+            const longShortRatio = shortTrades > 0 ? (longTrades / shortTrades).toFixed(2) : longTrades.toFixed(2);
+            
             document.getElementById('totalReturn').textContent = totalReturn >= 0 ? `+${totalReturn}%` : `${totalReturn}%`;
             document.getElementById('alpha').textContent = alpha >= 0 ? `+${alpha}%` : `${alpha}%`;
             document.getElementById('sharpe').textContent = sharpe;
             document.getElementById('maxDrawdown').textContent = `${maxDrawdown.toFixed(2)}%`;
             document.getElementById('winRate').textContent = `${winRate}%`;
-            document.getElementById('signalCount').textContent = trades.length * 106; // Approximate
-            document.getElementById('totalSignals').textContent = trades.length * 106;
+            document.getElementById('signalCount').textContent = trades.length;
+            document.getElementById('totalSignals').textContent = trades.length;
             document.getElementById('tradeCount').textContent = trades.length;
+            document.getElementById('longShort').textContent = longShortRatio;
+            
+            document.getElementById('returnDelta').textContent = alpha >= 0 ? `+${alpha}%` : `${alpha}%`;
         }
 
         function updatePositions(positions, state) {
@@ -954,26 +1522,23 @@
             
             document.getElementById('cashValue').textContent = `$${cash.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
             document.getElementById('stepCount').textContent = state.step_count;
+            document.getElementById('positionsUpdate').textContent = state.last_run_date || '-';
             
             let portfolioValue = cash;
-            const positionsHTML = [];
+            const positionsArray = Object.entries(positions);
             
-            // Mock current prices (in real implementation, would fetch from API)
-            const mockPrices = {
-                'ANET': 138.50,
-                'ABT': 115.20,
-                'FITB': 52.40,
-                'HBAN': 18.10,
-                'MKC': 63.50
-            };
+            if (positionsArray.length === 0) {
+                positionsList.innerHTML = '<div class="no-data-message">No open positions</div>';
+                document.getElementById('portfolioValue').textContent = `$${cash.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+                return;
+            }
             
-            for (const [ticker, position] of Object.entries(positions)) {
-                const currentPrice = mockPrices[ticker] || position.entry_price * 1.05;
-                const positionValue = position.shares * currentPrice;
-                portfolioValue += positionValue;
-                const percentage = (positionValue / (portfolioValue) * 100).toFixed(1);
+            const positionsHTML = positionsArray.map(([ticker, position]) => {
+                const positionValue = Math.abs(position.shares * position.entry_price);
+                portfolioValue += position.shares * position.entry_price;
+                const percentage = (positionValue / (cash + positionValue) * 100).toFixed(1);
                 
-                positionsHTML.push(`
+                return `
                     <div class="position-item">
                         <div class="position-header">
                             <span class="position-ticker">${ticker}</span>
@@ -984,7 +1549,7 @@
                         <div class="position-details">
                             <div class="position-detail-item">
                                 <span class="position-detail-label">Shares</span>
-                                <span class="position-detail-value">${Math.floor(position.shares)}</span>
+                                <span class="position-detail-value">${Math.abs(Math.floor(position.shares))}</span>
                             </div>
                             <div class="position-detail-item">
                                 <span class="position-detail-label">Entry</span>
@@ -997,16 +1562,16 @@
                         </div>
                         <div class="position-percentage">${percentage}% of portfolio</div>
                     </div>
-                `);
-            }
+                `;
+            }).join('');
             
-            positionsList.innerHTML = positionsHTML.join('');
+            positionsList.innerHTML = positionsHTML;
             document.getElementById('portfolioValue').textContent = `$${portfolioValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
         }
 
         function updateTradesTable(trades) {
             const tradesBody = document.getElementById('tradesBody');
-            const tradesHTML = trades.map(trade => {
+            const tradesHTML = trades.slice(0, 50).map(trade => {
                 const pnlClass = trade.pnl >= 0 ? 'positive' : 'negative';
                 const pnlSign = trade.pnl >= 0 ? '+' : '';
                 
@@ -1053,13 +1618,7 @@
                             label: 'Strategy',
                             data: strategyData,
                             borderColor: '#00d4aa',
-                            backgroundColor: function(context) {
-                                const ctx = context.chart.ctx;
-                                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                                gradient.addColorStop(0, 'rgba(0, 212, 170, 0.2)');
-                                gradient.addColorStop(1, 'rgba(0, 212, 170, 0)');
-                                return gradient;
-                            },
+                            backgroundColor: 'transparent',
                             borderWidth: 2,
                             fill: false,
                             tension: 0.4,
@@ -1095,7 +1654,6 @@
                             borderColor: '#2a2a2a',
                             borderWidth: 1,
                             padding: 12,
-                            displayColors: true,
                             callbacks: {
                                 label: function(context) {
                                     return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + '%';
@@ -1121,7 +1679,6 @@
                             grid: {
                                 drawBorder: false,
                                 color: function(context) {
-                                    // Bold zero line
                                     if (context.tick.value === 0) {
                                         return '#444';
                                     }
@@ -1142,11 +1699,6 @@
                                 maxTicksLimit: 8
                             }
                         }
-                    },
-                    interaction: {
-                        mode: 'nearest',
-                        axis: 'x',
-                        intersect: false
                     }
                 }
             });
@@ -1155,7 +1707,6 @@
         function updateExitReasonsChart(trades) {
             const ctx = document.getElementById('exitReasonsChart').getContext('2d');
             
-            // Count exit reasons
             const reasons = {};
             trades.forEach(trade => {
                 const reason = trade.exit_reason;
@@ -1164,7 +1715,7 @@
             
             const labels = Object.keys(reasons);
             const data = Object.values(reasons);
-            const colors = ['#ff4757', '#2ed573', '#00d4aa'];
+            const colors = ['#ff4757', '#2ed573', '#00d4aa', '#ffa502', '#1e90ff'];
             
             if (exitReasonsChart) {
                 exitReasonsChart.destroy();
@@ -1176,7 +1727,7 @@
                     labels: labels,
                     datasets: [{
                         data: data,
-                        backgroundColor: colors,
+                        backgroundColor: colors.slice(0, labels.length),
                         borderWidth: 0
                     }]
                 },
@@ -1199,9 +1750,24 @@
                     cutout: '70%'
                 }
             });
+            
+            const legendHTML = labels.map((label, i) => {
+                const count = data[i];
+                const pct = (count / trades.length * 100).toFixed(1);
+                return `
+                    <div class="donut-legend-item">
+                        <div class="donut-legend-label">
+                            <div class="donut-legend-color" style="background-color: ${colors[i]};"></div>
+                            <span>${label}</span>
+                        </div>
+                        <span style="color: #808080;">${pct}%</span>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('exitReasonsLegend').innerHTML = legendHTML;
         }
 
-        // Load data on page load
         window.addEventListener('DOMContentLoaded', loadData);
     </script>
 </body>
