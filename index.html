@@ -671,6 +671,82 @@
             border-color: #00d4aa;
         }
 
+        /* Autocomplete Styles */
+        .autocomplete-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .autocomplete-input {
+            width: 100%;
+            background-color: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            color: #e0e0e0;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .autocomplete-input:focus {
+            outline: none;
+            border-color: #00d4aa;
+        }
+
+        .autocomplete-input::placeholder {
+            color: #606060;
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            margin-top: -1px;
+        }
+
+        .autocomplete-dropdown.active {
+            display: block;
+        }
+
+        .autocomplete-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #e0e0e0;
+            transition: background-color 0.2s;
+        }
+
+        .autocomplete-item:hover, .autocomplete-item.selected {
+            background-color: #252525;
+        }
+
+        .autocomplete-item.highlighted {
+            background-color: #00d4aa;
+            color: #0a0a0a;
+        }
+
+        .autocomplete-no-results {
+            padding: 10px 12px;
+            color: #606060;
+            font-size: 13px;
+            font-style: italic;
+        }
+
+        .ticker-count {
+            font-size: 11px;
+            color: #606060;
+            margin-top: 4px;
+        }
+
         .analyze-btn {
             background: linear-gradient(135deg, #00d4aa 0%, #00a8ff 100%);
             border: none;
@@ -1001,10 +1077,17 @@
         <div class="ticker-controls">
             <div class="control-group">
                 <label class="control-label">Ticker Symbol</label>
-                <select class="control-select" id="tickerSelect">
-                    <option value="">Select a ticker...</option>
-                    <!-- Will be populated dynamically -->
-                </select>
+                <div class="autocomplete-container">
+                    <input 
+                        type="text" 
+                        class="autocomplete-input" 
+                        id="tickerInput" 
+                        placeholder="Type to search (e.g., AAPL, MSFT, TSLA...)"
+                        autocomplete="off"
+                    >
+                    <div class="autocomplete-dropdown" id="tickerDropdown"></div>
+                </div>
+                <div class="ticker-count" id="tickerCount">Loading tickers...</div>
             </div>
             <div class="control-group">
                 <label class="control-label">Start Date</label>
