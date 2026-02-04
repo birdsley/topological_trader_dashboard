@@ -1192,7 +1192,9 @@
         let equityChart;
         let exitReasonsChart;
         let marketDataCache = {};
-        let availableTickers = new Set();
+        let availableTickers = [];
+        let selectedTicker = null;
+        let currentHighlightIndex = -1;
 
         // Main tab switching
         function switchMainTab(tabName) {
@@ -1209,25 +1211,37 @@
 
         // Initialize ticker analysis tab
         async function initializeTickerAnalysis() {
+            if (availableTickers.length > 0) return; // Already initialized
+            
             try {
-                // Scan for available market data files
-                const dataFiles = await scanMarketDataFiles();
+                // Load the CSV file
+                const data = await fetchCSV('data/market_data/minute_bars_2026-02-03.csv');
                 
-                if (dataFiles.length === 0) {
-                    console.log('No market data files found');
+                if (data.length === 0) {
+                    document.getElementById('tickerCount').textContent = 'No market data available';
                     return;
                 }
                 
-                // Set default date range
-                const dates = dataFiles.map(f => f.date).sort();
-                document.getElementById('startDate').value = dates[0];
-                document.getElementById('endDate').value = dates[dates.length - 1];
+                // Extract unique tickers
+                const tickersSet = new Set(data.map(row => row.ticker));
+                availableTickers = Array.from(tickersSet).sort();
                 
-                // Load sample file to get ticker list
-                await loadTickerList(dataFiles[0].path);
+                document.getElementById('tickerCount').textContent = 
+                    `${availableTickers.length} tickers available`;
+                
+                // Set default dates
+                document.getElementById('startDate').value = '2026-02-03';
+                document.getElementById('endDate').value = '2026-02-03';
+                
+                // Initialize autocomplete
+                initializeAutocomplete();
+                
+                // Cache the data
+                marketDataCache['2026-02-03'] = data;
                 
             } catch (error) {
                 console.error('Error initializing ticker analysis:', error);
+                document.getElementById('tickerCount').textContent = 'Error loading market data';
             }
         }
 
@@ -1304,6 +1318,98 @@
             return [];
         }
 
+        function initializeAutocomplete() {
+            const input = document.getElementById('tickerInput');
+            const dropdown = document.getElementById('tickerDropdown');
+            
+            input.addEventListener('input', function() {
+                const query = this.value.toUpperCase().trim();
+                
+                if (query.length === 0) {
+                    dropdown.classList.remove('active');
+                    currentHighlightIndex = -1;
+                    return;
+                }
+                
+                const filtered = availableTickers.filter(ticker => 
+                    ticker.startsWith(query)
+                ).slice(0, 50); // Limit to 50 results
+                
+                if (filtered.length === 0) {
+                    dropdown.innerHTML = '<div class="autocomplete-no-results">No tickers found matching "' + query + '"</div>';
+                    dropdown.classList.add('active');
+                    return;
+                }
+                
+                dropdown.innerHTML = filtered.map((ticker, index) => 
+                    `<div class="autocomplete-item" data-ticker="${ticker}" data-index="${index}">${ticker}</div>`
+                ).join('');
+                
+                dropdown.classList.add('active');
+                currentHighlightIndex = -1;
+                
+                // Add click handlers
+                dropdown.querySelectorAll('.autocomplete-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        selectTicker(this.dataset.ticker);
+                    });
+                });
+            });
+            
+            input.addEventListener('keydown', function(e) {
+                const items = dropdown.querySelectorAll('.autocomplete-item');
+                
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    currentHighlightIndex = Math.min(currentHighlightIndex + 1, items.length - 1);
+                    updateHighlight(items);
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    currentHighlightIndex = Math.max(currentHighlightIndex - 1, -1);
+                    updateHighlight(items);
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (currentHighlightIndex >= 0 && items[currentHighlightIndex]) {
+                        selectTicker(items[currentHighlightIndex].dataset.ticker);
+                    } else if (items.length === 1) {
+                        selectTicker(items[0].dataset.ticker);
+                    }
+                } else if (e.key === 'Escape') {
+                    dropdown.classList.remove('active');
+                    currentHighlightIndex = -1;
+                }
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('active');
+                    currentHighlightIndex = -1;
+                }
+            });
+        }
+        
+        function updateHighlight(items) {
+            items.forEach((item, index) => {
+                if (index === currentHighlightIndex) {
+                    item.classList.add('highlighted');
+                    item.scrollIntoView({ block: 'nearest' });
+                } else {
+                    item.classList.remove('highlighted');
+                }
+            });
+        }
+        
+        function selectTicker(ticker) {
+            selectedTicker = ticker;
+            document.getElementById('tickerInput').value = ticker;
+            document.getElementById('tickerDropdown').classList.remove('active');
+            currentHighlightIndex = -1;
+            
+            // Enable analyze button
+            document.getElementById('analyzeBtn').disabled = false;
+        }
+        
         function calculateTickerMetrics(data) {
             // Calculate all required metrics
             const firstPrice = data[0].open;
