@@ -7,6 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -1099,7 +1100,7 @@
             </div>
             <div class="control-group">
                 <label class="control-label" style="opacity: 0;">Action</label>
-                <button class="analyze-btn" onclick="analyzeTicker()" id="analyzeBtn">
+                <button class="analyze-btn" onclick="analyzeTicker()" id="analyzeBtn" disabled>
                     Analyze Ticker
                 </button>
             </div>
@@ -1143,7 +1144,7 @@
             <!-- Main Composite Chart -->
             <div class="chart-container">
                 <div class="chart-header">
-                    <div class="chart-title">Intraday Price Action</div>
+                    <div class="chart-title" id="chartTitle">Intraday Price Action</div>
                     <div class="chart-subtitle">Candlesticks with VWAP & Bollinger Bands</div>
                 </div>
                 <div id="mainTickerChart" class="plotly-chart"></div>
@@ -1193,6 +1194,7 @@
         let exitReasonsChart;
         let marketDataCache = {};
         let availableTickers = [];
+        let availableDates = {};
         let selectedTicker = null;
         let currentHighlightIndex = -1;
 
@@ -1214,30 +1216,32 @@
             if (availableTickers.length > 0) return; // Already initialized
             
             try {
-                // Load the CSV file
-                const data = await fetchCSV('data/market_data/minute_bars_2026-02-03.csv');
+                document.getElementById('tickerCount').textContent = 'Scanning market data...';
                 
-                if (data.length === 0) {
+                // Scan the market_data directory for ticker folders
+                const tickers = await scanTickerFolders();
+                
+                if (tickers.length === 0) {
                     document.getElementById('tickerCount').textContent = 'No market data available';
                     return;
                 }
                 
-                // Extract unique tickers
-                const tickersSet = new Set(data.map(row => row.ticker));
-                availableTickers = Array.from(tickersSet).sort();
+                availableTickers = tickers.sort();
                 
                 document.getElementById('tickerCount').textContent = 
                     `${availableTickers.length} tickers available`;
                 
-                // Set default dates
-                document.getElementById('startDate').value = '2026-02-03';
-                document.getElementById('endDate').value = '2026-02-03';
+                // Get available date range from first ticker
+                if (availableTickers.length > 0) {
+                    const dates = await getAvailableDates(availableTickers[0]);
+                    if (dates.length > 0) {
+                        document.getElementById('startDate').value = dates[0];
+                        document.getElementById('endDate').value = dates[dates.length - 1];
+                    }
+                }
                 
                 // Initialize autocomplete
                 initializeAutocomplete();
-                
-                // Cache the data
-                marketDataCache['2026-02-03'] = data;
                 
             } catch (error) {
                 console.error('Error initializing ticker analysis:', error);
@@ -1245,77 +1249,50 @@
             }
         }
 
-        async function scanMarketDataFiles() {
-            // This would need to be implemented based on your file structure
-            // For now, return empty array - would need backend support
-            return [];
-        }
-
-        async function loadTickerList(filePath) {
-            try {
-                const data = await fetchCSV(filePath);
-                const tickers = [...new Set(data.map(row => row.ticker))].sort();
-                
-                const select = document.getElementById('tickerSelect');
-                select.innerHTML = '<option value="">Select a ticker...</option>';
-                
-                tickers.forEach(ticker => {
-                    const option = document.createElement('option');
-                    option.value = ticker;
-                    option.textContent = ticker;
-                    select.appendChild(option);
-                });
-                
-            } catch (error) {
-                console.error('Error loading ticker list:', error);
-            }
-        }
-
-        async function analyzeTicker() {
-            const ticker = document.getElementById('tickerSelect').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
+        async function scanTickerFolders() {
+            // Since we can't actually scan the directory structure from JavaScript,
+            // we'll use a hardcoded list that matches what GitHub shows
+            // In production, this would come from an API endpoint
             
-            if (!ticker) {
-                alert('Please select a ticker');
-                return;
-            }
-            
+            // For now, try to fetch a known ticker to verify structure
             try {
-                document.getElementById('analyzeBtn').disabled = true;
-                document.getElementById('analyzeBtn').textContent = 'Loading...';
-                
-                // Load and process data
-                const data = await loadTickerData(ticker, startDate, endDate);
-                
-                if (data.length === 0) {
-                    alert('No data found for selected ticker and date range');
-                    return;
+                const testResponse = await fetch('data/market_data/AAPL/2026-01-28.csv.gz');
+                if (testResponse.ok) {
+                    // Return a comprehensive list of S&P 500 tickers
+                    // This should match your actual data
+                    return ['A', 'AAPL', 'ABBV', 'ABC', 'ABNB', 'ABT', 'ACGL', 'ACN', 'ADBE', 'ADI', 'ADM', 'ADP', 'ADSK', 'AEE', 'AEP', 'AES', 'AFL', 'AIG', 'AIZ', 'AJG', 'AKAM', 'ALB', 'ALGN', 'ALL', 'ALLE', 'AMAT', 'AMCR', 'AMD', 'AME', 'AMGN', 'AMP', 'AMT', 'AMZN', 'ANET', 'ANSS', 'AON', 'AOS', 'APA', 'APD', 'APH', 'APTV', 'ARE', 'ATO', 'AVB', 'AVGO', 'AVY', 'AWK', 'AXON', 'AXP', 'AZO', 'BA', 'BAC', 'BALL', 'BAX', 'BBWI', 'BBY', 'BDX', 'BEN', 'BF-B', 'BG', 'BIIB', 'BK', 'BKNG', 'BKR', 'BLDR', 'BLK', 'BMY', 'BR', 'BRK-B', 'BRO', 'BSX', 'BWA', 'BX', 'BXP', 'C', 'CAG', 'CAH', 'CARR', 'CAT', 'CB', 'CBOE', 'CBRE', 'CCI', 'CCL', 'CDNS', 'CDW', 'CE', 'CEG', 'CF', 'CFG', 'CHD', 'CHRW', 'CHTR', 'CI', 'CINF', 'CL', 'CLX', 'CMA', 'CMCSA', 'CME', 'CMG', 'CMI', 'CMS', 'CNC', 'CNP', 'COF', 'COO', 'COP', 'COR', 'COST', 'CPAY', 'CPB', 'CPRT', 'CPT', 'CRL', 'CRM', 'CRWD', 'CSCO', 'CSGP', 'CSX', 'CTAS', 'CTLT', 'CTRA', 'CTSH', 'CTVA', 'CVS', 'CVX', 'CZR', 'D', 'DAL', 'DAY', 'DD', 'DE', 'DECK', 'DFS', 'DG', 'DGX', 'DHI', 'DHR', 'DIS', 'DLR', 'DLTR', 'DOC', 'DOV', 'DOW', 'DPZ', 'DRI', 'DTE', 'DUK', 'DVA', 'DVN', 'DXCM', 'EA', 'EBAY', 'ECL', 'ED', 'EFX', 'EG', 'EIX', 'EL', 'ELV', 'EMN', 'EMR', 'ENPH', 'EOG', 'EPAM', 'EQIX', 'EQR', 'EQT', 'ERIE', 'ES', 'ESS', 'ETN', 'ETR', 'EVRG', 'EW', 'EXC', 'EXPD', 'EXPE', 'EXR', 'F', 'FANG', 'FAST', 'FCX', 'FDS', 'FDX', 'FE', 'FFIV', 'FI', 'FICO', 'FIS', 'FITB', 'FMC', 'FOX', 'FOXA', 'FRT', 'FSLR', 'FTNT', 'FTV', 'GD', 'GDDY', 'GE', 'GEHC', 'GEN', 'GEV', 'GILD', 'GIS', 'GL', 'GLW', 'GM', 'GNRC', 'GOOG', 'GOOGL', 'GPC', 'GPN', 'GRMN', 'GS', 'GWW', 'HAL', 'HAS', 'HBAN', 'HCA', 'HD', 'HES', 'HIG', 'HII', 'HLT', 'HOLX', 'HON', 'HPE', 'HPQ', 'HRL', 'HSIC', 'HST', 'HSY', 'HUBB', 'HUM', 'HWM', 'IBM', 'ICE', 'IDXX', 'IEX', 'IFF', 'INCY', 'INTC', 'INTU', 'INVH', 'IP', 'IPG', 'IQV', 'IR', 'IRM', 'ISRG', 'IT', 'ITW', 'IVZ', 'J', 'JBHT', 'JBL', 'JCI', 'JKHY', 'JNJ', 'JNPR', 'JPM', 'K', 'KDP', 'KEY', 'KEYS', 'KHC', 'KIM', 'KLAC', 'KMB', 'KMI', 'KMX', 'KO', 'KR', 'KVUE', 'L', 'LDOS', 'LEN', 'LH', 'LHX', 'LIN', 'LKQ', 'LLY', 'LMT', 'LNT', 'LOW', 'LRCX', 'LULU', 'LUV', 'LVS', 'LW', 'LYB', 'LYV', 'MA', 'MAA', 'MAR', 'MAS', 'MCD', 'MCHP', 'MCK', 'MCO', 'MDLZ', 'MDT', 'MET', 'META', 'MGM', 'MHK', 'MKC', 'MKTX', 'MLM', 'MMC', 'MMM', 'MNST', 'MO', 'MOH', 'MOS', 'MPC', 'MPWR', 'MRK', 'MRNA', 'MRO', 'MS', 'MSCI', 'MSFT', 'MSI', 'MTB', 'MTCH', 'MTD', 'MU', 'NCLH', 'NDAQ', 'NDSN', 'NEE', 'NEM', 'NFLX', 'NI', 'NKE', 'NOC', 'NOW', 'NRG', 'NSC', 'NTAP', 'NTRS', 'NUE', 'NVDA', 'NVR', 'NWS', 'NWSA', 'NXPI', 'O', 'ODFL', 'OKE', 'OMC', 'ON', 'ORCL', 'ORLY', 'OTIS', 'OXY', 'PANW', 'PARA', 'PAYC', 'PAYX', 'PCAR', 'PCG', 'PEG', 'PEP', 'PFE', 'PFG', 'PG', 'PGR', 'PH', 'PHM', 'PKG', 'PLD', 'PM', 'PNC', 'PNR', 'PNW', 'PODD', 'POOL', 'PPG', 'PPL', 'PRU', 'PSA', 'PSX', 'PTC', 'PWR', 'PYPL', 'QCOM', 'QRVO', 'RCL', 'REG', 'REGN', 'RF', 'RJF', 'RL', 'RMD', 'ROK', 'ROL', 'ROP', 'ROST', 'RSG', 'RTX', 'RVTY', 'SBAC', 'SBUX', 'SCHW', 'SHW', 'SJM', 'SLB', 'SMCI', 'SNA', 'SNPS', 'SO', 'SOLV', 'SPG', 'SPGI', 'SRE', 'STE', 'STLD', 'STT', 'STX', 'STZ', 'SWK', 'SWKS', 'SYF', 'SYK', 'SYY', 'T', 'TAP', 'TDG', 'TDY', 'TECH', 'TEL', 'TER', 'TFC', 'TFX', 'TGT', 'TJX', 'TMO', 'TMUS', 'TPR', 'TRGP', 'TRMB', 'TROW', 'TRV', 'TSCO', 'TSLA', 'TSN', 'TT', 'TTWO', 'TXN', 'TXT', 'TYL', 'UAL', 'UBER', 'UDR', 'UHS', 'ULTA', 'UNH', 'UNP', 'UPS', 'URI', 'USB', 'V', 'VICI', 'VLO', 'VLTO', 'VMC', 'VRSK', 'VRSN', 'VRTX', 'VST', 'VTR', 'VTRS', 'VZ', 'WAB', 'WAT', 'WBA', 'WBD', 'WDC', 'WEC', 'WELL', 'WFC', 'WM', 'WMB', 'WMT', 'WRB', 'WST', 'WTW', 'WY', 'WYNN', 'XEL', 'XOM', 'XYL', 'YUM', 'ZBH', 'ZBRA', 'ZTS'];
                 }
-                
-                // Calculate metrics
-                const metrics = calculateTickerMetrics(data);
-                
-                // Update UI
-                updateTickerMetrics(metrics);
-                renderTickerCharts(data, metrics);
-                
-                document.getElementById('noTickerData').style.display = 'none';
-                document.getElementById('tickerAnalysisResults').style.display = 'block';
-                
-            } catch (error) {
-                console.error('Error analyzing ticker:', error);
-                alert('Error loading ticker data');
-            } finally {
-                document.getElementById('analyzeBtn').disabled = false;
-                document.getElementById('analyzeBtn').textContent = 'Analyze Ticker';
+            } catch (e) {
+                console.error('Error testing ticker structure:', e);
             }
+            
+            return [];
         }
 
-        async function loadTickerData(ticker, startDate, endDate) {
-            // Mock data for demonstration
-            // In production, this would load actual CSV files
-            return [];
+        async function getAvailableDates(ticker) {
+            // For a given ticker, scan available date files
+            // Since we can't list directory contents, we'll try a range of dates
+            const dates = [
+                '2026-01-28',
+                '2026-01-29',
+                '2026-01-30',
+                '2026-02-02',
+                '2026-02-03'
+            ];
+            
+            const availableDates = [];
+            for (const date of dates) {
+                try {
+                    const response = await fetch(`data/market_data/${ticker}/${date}.csv.gz`, {method: 'HEAD'});
+                    if (response.ok) {
+                        availableDates.push(date);
+                    }
+                } catch (e) {
+                    // File doesn't exist
+                }
+            }
+            
+            return availableDates;
         }
 
         function initializeAutocomplete() {
@@ -1333,7 +1310,7 @@
                 
                 const filtered = availableTickers.filter(ticker => 
                     ticker.startsWith(query)
-                ).slice(0, 50); // Limit to 50 results
+                ).slice(0, 50);
                 
                 if (filtered.length === 0) {
                     dropdown.innerHTML = '<div class="autocomplete-no-results">No tickers found matching "' + query + '"</div>';
@@ -1348,7 +1325,6 @@
                 dropdown.classList.add('active');
                 currentHighlightIndex = -1;
                 
-                // Add click handlers
                 dropdown.querySelectorAll('.autocomplete-item').forEach(item => {
                     item.addEventListener('click', function() {
                         selectTicker(this.dataset.ticker);
@@ -1380,7 +1356,6 @@
                 }
             });
             
-            // Close dropdown when clicking outside
             document.addEventListener('click', function(e) {
                 if (!input.contains(e.target) && !dropdown.contains(e.target)) {
                     dropdown.classList.remove('active');
@@ -1405,20 +1380,103 @@
             document.getElementById('tickerInput').value = ticker;
             document.getElementById('tickerDropdown').classList.remove('active');
             currentHighlightIndex = -1;
-            
-            // Enable analyze button
             document.getElementById('analyzeBtn').disabled = false;
+        }
+
+        async function analyzeTicker() {
+            if (!selectedTicker) {
+                alert('Please select a ticker');
+                return;
+            }
+            
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!startDate || !endDate) {
+                alert('Please select both start and end dates');
+                return;
+            }
+            
+            try {
+                document.getElementById('analyzeBtn').disabled = true;
+                document.getElementById('analyzeBtn').textContent = 'Loading...';
+                
+                const data = await loadTickerData(selectedTicker, startDate, endDate);
+                
+                if (data.length === 0) {
+                    alert(`No data found for ${selectedTicker} between ${startDate} and ${endDate}`);
+                    return;
+                }
+                
+                const metrics = calculateTickerMetrics(data);
+                updateTickerMetrics(metrics, selectedTicker);
+                renderTickerCharts(data, metrics, selectedTicker);
+                
+                document.getElementById('noTickerData').style.display = 'none';
+                document.getElementById('tickerAnalysisResults').style.display = 'block';
+                
+                document.getElementById('chartTitle').textContent = 
+                    `${selectedTicker} - ${startDate} to ${endDate}`;
+                
+            } catch (error) {
+                console.error('Error analyzing ticker:', error);
+                alert('Error loading ticker data: ' + error.message);
+            } finally {
+                document.getElementById('analyzeBtn').disabled = false;
+                document.getElementById('analyzeBtn').textContent = 'Analyze Ticker';
+            }
+        }
+
+        async function loadTickerData(ticker, startDate, endDate) {
+            const allData = [];
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            
+            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                const dateStr = d.toISOString().split('T')[0];
+                
+                try {
+                    const data = await fetchGzippedCSV(`data/market_data/${ticker}/${dateStr}.csv.gz`);
+                    if (data && data.length > 0) {
+                        allData.push(...data);
+                    }
+                } catch (e) {
+                    console.log(`No data for ${ticker} on ${dateStr}`);
+                }
+            }
+            
+            return allData.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+        }
+
+        async function fetchGzippedCSV(url) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) return [];
+                
+                const arrayBuffer = await response.arrayBuffer();
+                const decompressed = pako.ungzip(new Uint8Array(arrayBuffer), { to: 'string' });
+                
+                return new Promise((resolve) => {
+                    Papa.parse(decompressed, {
+                        header: true,
+                        dynamicTyping: true,
+                        skipEmptyLines: true,
+                        complete: (results) => resolve(results.data)
+                    });
+                });
+            } catch (e) {
+                console.error(`Error loading ${url}:`, e);
+                return [];
+            }
         }
         
         function calculateTickerMetrics(data) {
-            // Calculate all required metrics
+            if (data.length === 0) return {};
+            
             const firstPrice = data[0].open;
             const lastPrice = data[data.length - 1].close;
-            
-            // Session return
             const sessionReturn = (lastPrice - firstPrice) / firstPrice;
             
-            // VWAP
             let sumPriceVolume = 0;
             let sumVolume = 0;
             data.forEach(bar => {
@@ -1426,29 +1484,40 @@
                 sumPriceVolume += avgPrice * bar.volume;
                 sumVolume += bar.volume;
             });
-            const vwap = sumPriceVolume / sumVolume;
+            const vwap = sumVolume > 0 ? sumPriceVolume / sumVolume : lastPrice;
             const vwapDist = (lastPrice - vwap) / vwap;
             
-            // Realized volatility
             const logReturns = [];
             for (let i = 1; i < data.length; i++) {
-                logReturns.push(Math.log(data[i].close / data[i-1].close));
+                if (data[i-1].close > 0) {
+                    logReturns.push(Math.log(data[i].close / data[i-1].close));
+                }
             }
-            const volatility = Math.sqrt(logReturns.reduce((sum, r) => sum + r*r, 0) / logReturns.length) * Math.sqrt(390);
+            const variance = logReturns.reduce((sum, r) => sum + r*r, 0) / logReturns.length;
+            const volatility = Math.sqrt(variance) * Math.sqrt(390);
             
-            // High-low range
-            const hlRanges = data.map(bar => (bar.high - bar.low) / bar.close);
+            const hlRanges = data.map(bar => bar.close > 0 ? (bar.high - bar.low) / bar.close : 0);
             const avgHLRange = hlRanges.reduce((sum, r) => sum + r, 0) / hlRanges.length;
             
-            // Volume
             const avgVolume = data.reduce((sum, bar) => sum + bar.volume, 0) / data.length;
+            const medianVolume = data.map(b => b.volume).sort((a, b) => a - b)[Math.floor(data.length / 2)];
             
-            // Mean reversion
             const sma20 = [];
+            const zScores = [];
+            
             for (let i = 19; i < data.length; i++) {
-                const sum = data.slice(i-19, i+1).reduce((s, bar) => s + bar.close, 0);
-                sma20.push(sum / 20);
+                const prices = data.slice(i-19, i+1).map(b => b.close);
+                const mean = prices.reduce((s, p) => s + p, 0) / 20;
+                sma20.push(mean);
+                
+                const variance = prices.reduce((s, p) => s + (p - mean)**2, 0) / 20;
+                const std = Math.sqrt(variance);
+                const z = std > 0 ? (data[i].close - mean) / std : 0;
+                zScores.push(z);
             }
+            
+            const extremeZScores = zScores.filter(z => Math.abs(z) > 1).length;
+            const meanReversionScore = zScores.length > 0 ? extremeZScores / zScores.length : 0;
             
             return {
                 sessionReturn,
@@ -1457,50 +1526,60 @@
                 volatility,
                 avgHLRange,
                 avgVolume,
-                sma20
+                medianVolume,
+                sma20,
+                zScores,
+                meanReversionScore,
+                firstPrice,
+                lastPrice
             };
         }
 
-        function updateTickerMetrics(metrics) {
-            document.getElementById('sessionReturn').textContent = 
-                (metrics.sessionReturn * 100).toFixed(2) + '%';
-            document.getElementById('sessionReturn').className = 
-                'ticker-metric-value ' + (metrics.sessionReturn >= 0 ? 'positive' : 'negative');
+        function updateTickerMetrics(metrics, ticker) {
+            const sessionReturnEl = document.getElementById('sessionReturn');
+            sessionReturnEl.textContent = (metrics.sessionReturn * 100).toFixed(2) + '%';
+            sessionReturnEl.className = 'ticker-metric-value ' + (metrics.sessionReturn >= 0 ? 'positive' : 'negative');
                 
-            document.getElementById('vwapValue').textContent = 
-                '$' + metrics.vwap.toFixed(2);
-            document.getElementById('vwapDist').textContent = 
-                'Dist: ' + (metrics.vwapDist * 100).toFixed(2) + '%';
+            document.getElementById('vwapValue').textContent = '$' + metrics.vwap.toFixed(2);
+            const vwapDistEl = document.getElementById('vwapDist');
+            vwapDistEl.textContent = 'Distance: ' + (metrics.vwapDist * 100).toFixed(2) + '%';
+            vwapDistEl.style.color = metrics.vwapDist >= 0 ? '#00d4aa' : '#ff4757';
                 
-            document.getElementById('realizedVol').textContent = 
-                (metrics.volatility * 100).toFixed(1) + '%';
-                
-            document.getElementById('avgHLRange').textContent = 
-                (metrics.avgHLRange * 100).toFixed(2) + '%';
-                
-            document.getElementById('avgVolume').textContent = 
-                metrics.avgVolume.toLocaleString('en-US', {maximumFractionDigits: 0});
-                
-            document.getElementById('meanReversionScore').textContent = '0.72';
-            document.getElementById('meanRevSub').textContent = 'Strong mean reversion';
+            document.getElementById('realizedVol').textContent = (metrics.volatility * 100).toFixed(1) + '%';
+            document.getElementById('avgHLRange').textContent = (metrics.avgHLRange * 100).toFixed(2) + '%';
+            
+            const volumeK = (metrics.avgVolume / 1000).toFixed(1);
+            document.getElementById('avgVolume').textContent = volumeK + 'K';
+            
+            const revScore = (metrics.meanReversionScore * 100).toFixed(0);
+            document.getElementById('meanReversionScore').textContent = revScore + '%';
+            
+            let revText = 'Weak mean reversion';
+            if (metrics.meanReversionScore > 0.3) revText = 'Strong mean reversion';
+            else if (metrics.meanReversionScore > 0.15) revText = 'Moderate mean reversion';
+            document.getElementById('meanRevSub').textContent = revText;
         }
 
-        function renderTickerCharts(data, metrics) {
-            // Render main composite chart with Plotly
-            const trace1 = {
-                x: data.map(d => d.datetime),
+        function renderTickerCharts(data, metrics, ticker) {
+            data.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+            
+            const datetimes = data.map(d => d.datetime);
+            
+            const candlestick = {
+                x: datetimes,
                 open: data.map(d => d.open),
                 high: data.map(d => d.high),
                 low: data.map(d => d.low),
                 close: data.map(d => d.close),
                 type: 'candlestick',
-                name: 'Price',
-                increasing: {line: {color: '#00d4aa'}},
-                decreasing: {line: {color: '#ff4757'}}
+                name: ticker,
+                increasing: {line: {color: '#00d4aa', width: 1}},
+                decreasing: {line: {color: '#ff4757', width: 1}},
+                whiskerwidth: 0.5
             };
             
-            const trace2 = {
-                x: data.map(d => d.datetime),
+            const vwapLine = {
+                x: datetimes,
                 y: Array(data.length).fill(metrics.vwap),
                 type: 'scatter',
                 mode: 'lines',
@@ -1508,59 +1587,126 @@
                 line: {color: '#ff9f43', width: 2}
             };
             
-            const layout = {
-                paper_bgcolor: '#0a0a0a',
-                plot_bgcolor: '#0a0a0a',
-                font: {color: '#e0e0e0'},
-                xaxis: {
-                    gridcolor: '#1a1a1a',
-                    showgrid: true
-                },
-                yaxis: {
-                    gridcolor: '#1a1a1a',
-                    showgrid: true
-                },
-                margin: {l: 50, r: 50, t: 20, b: 50},
+            const smaX = datetimes.slice(19);
+            const smaY = metrics.sma20;
+            
+            const std20 = [];
+            for (let i = 19; i < data.length; i++) {
+                const prices = data.slice(i-19, i+1).map(d => d.close);
+                const mean = smaY[i-19];
+                const variance = prices.reduce((s, p) => s + (p - mean)**2, 0) / 20;
+                std20.push(Math.sqrt(variance));
+            }
+            
+            const smaLine = {
+                x: smaX,
+                y: smaY,
+                type: 'scatter',
+                mode: 'lines',
+                name: '20-min SMA',
+                line: {color: '#00a8ff', width: 1.5}
+            };
+            
+            const upperBand = smaY.map((v, i) => v + std20[i]);
+            const lowerBand = smaY.map((v, i) => v - std20[i]);
+            
+            const upperBandLine = {
+                x: smaX,
+                y: upperBand,
+                type: 'scatter',
+                mode: 'lines',
+                name: '+1σ',
+                line: {color: '#606060', width: 1, dash: 'dot'},
                 showlegend: false
             };
             
-            Plotly.newPlot('mainTickerChart', [trace1, trace2], layout, {responsive: true});
+            const lowerBandLine = {
+                x: smaX,
+                y: lowerBand,
+                type: 'scatter',
+                mode: 'lines',
+                name: '-1σ',
+                line: {color: '#606060', width: 1, dash: 'dot'},
+                fill: 'tonexty',
+                fillcolor: 'rgba(96, 96, 96, 0.1)',
+                showlegend: false
+            };
             
-            // Render secondary charts (simplified)
-            renderVolatilityChart(data);
+            const layout = {
+                paper_bgcolor: '#0a0a0a',
+                plot_bgcolor: '#0a0a0a',
+                font: {color: '#e0e0e0', size: 11},
+                xaxis: {gridcolor: '#1a1a1a', showgrid: true, type: 'date'},
+                yaxis: {gridcolor: '#1a1a1a', showgrid: true, title: 'Price ($)'},
+                margin: {l: 60, r: 50, t: 30, b: 50},
+                showlegend: true,
+                legend: {
+                    x: 0.01,
+                    y: 0.99,
+                    bgcolor: 'rgba(26, 26, 26, 0.8)',
+                    bordercolor: '#2a2a2a',
+                    borderwidth: 1
+                },
+                hovermode: 'x unified'
+            };
+            
+            Plotly.newPlot('mainTickerChart', 
+                [candlestick, vwapLine, smaLine, upperBandLine, lowerBandLine], 
+                layout, 
+                {responsive: true}
+            );
+            
+            renderVolatilityChart(data, datetimes);
             renderVolumeProfile(data);
-            renderZScoreChart(data, metrics);
+            renderZScoreChart(datetimes.slice(19), metrics.zScores);
         }
 
-        function renderVolatilityChart(data) {
+        function renderVolatilityChart(data, datetimes) {
+            const window = 15;
+            const rollingVol = [];
+            const volX = [];
+            
+            for (let i = window; i < data.length; i++) {
+                const returns = [];
+                for (let j = i - window + 1; j <= i; j++) {
+                    if (data[j-1].close > 0) {
+                        returns.push(Math.log(data[j].close / data[j-1].close));
+                    }
+                }
+                const variance = returns.reduce((s, r) => s + r*r, 0) / returns.length;
+                rollingVol.push(Math.sqrt(variance) * Math.sqrt(390) * 100);
+                volX.push(datetimes[i]);
+            }
+            
             const trace = {
-                x: data.map(d => d.datetime),
-                y: data.map(d => Math.random() * 0.5), // Placeholder
+                x: volX,
+                y: rollingVol,
                 type: 'scatter',
                 mode: 'lines',
                 fill: 'tozeroy',
-                line: {color: '#00d4aa'}
+                line: {color: '#00d4aa', width: 2},
+                fillcolor: 'rgba(0, 212, 170, 0.2)'
             };
             
             const layout = {
                 paper_bgcolor: '#0a0a0a',
                 plot_bgcolor: '#0a0a0a',
                 font: {color: '#e0e0e0', size: 10},
-                xaxis: {gridcolor: '#1a1a1a', showgrid: true},
-                yaxis: {gridcolor: '#1a1a1a', showgrid: true},
-                margin: {l: 40, r: 20, t: 20, b: 40},
-                showlegend: false
+                xaxis: {gridcolor: '#1a1a1a', showgrid: true, type: 'date'},
+                yaxis: {gridcolor: '#1a1a1a', showgrid: true, title: 'Volatility (%)'},
+                margin: {l: 50, r: 20, t: 20, b: 40},
+                showlegend: false,
+                hovermode: 'x'
             };
             
             Plotly.newPlot('volatilityChart', [trace], layout, {responsive: true});
         }
 
         function renderVolumeProfile(data) {
-            // Price buckets
             const prices = data.map(d => d.close);
             const minPrice = Math.min(...prices);
             const maxPrice = Math.max(...prices);
-            const buckets = 20;
+            const buckets = 30;
             const bucketSize = (maxPrice - minPrice) / buckets;
             
             const volumeByPrice = {};
@@ -1569,12 +1715,14 @@
                 volumeByPrice[bucket] = (volumeByPrice[bucket] || 0) + bar.volume;
             });
             
+            const sortedBuckets = Object.keys(volumeByPrice).map(Number).sort((a, b) => a - b);
+            
             const trace = {
-                y: Object.keys(volumeByPrice).map(Number),
-                x: Object.values(volumeByPrice),
+                y: sortedBuckets,
+                x: sortedBuckets.map(b => volumeByPrice[b]),
                 type: 'bar',
                 orientation: 'h',
-                marker: {color: '#00d4aa'}
+                marker: {color: '#00d4aa', line: {color: '#00a8ff', width: 0.5}}
             };
             
             const layout = {
@@ -1582,40 +1730,56 @@
                 plot_bgcolor: '#0a0a0a',
                 font: {color: '#e0e0e0', size: 10},
                 xaxis: {gridcolor: '#1a1a1a', showgrid: true, title: 'Volume'},
-                yaxis: {gridcolor: '#1a1a1a', showgrid: true, title: 'Price'},
+                yaxis: {gridcolor: '#1a1a1a', showgrid: true, title: 'Price ($)', tickformat: '.2f'},
                 margin: {l: 50, r: 20, t: 20, b: 40},
-                showlegend: false
+                showlegend: false,
+                hovermode: 'y'
             };
             
             Plotly.newPlot('volumeProfileChart', [trace], layout, {responsive: true});
         }
 
-        function renderZScoreChart(data, metrics) {
+        function renderZScoreChart(datetimes, zScores) {
             const trace = {
-                x: data.map(d => d.datetime),
-                y: data.map((d, i) => (Math.random() - 0.5) * 4), // Placeholder
+                x: datetimes,
+                y: zScores,
                 type: 'scatter',
                 mode: 'lines',
-                line: {color: '#00a8ff'}
+                line: {color: '#00a8ff', width: 2}
+            };
+            
+            const zeroLine = {
+                x: [datetimes[0], datetimes[datetimes.length-1]],
+                y: [0, 0],
+                type: 'scatter',
+                mode: 'lines',
+                line: {color: '#808080', width: 1, dash: 'solid'},
+                showlegend: false,
+                hoverinfo: 'skip'
             };
             
             const layout = {
                 paper_bgcolor: '#0a0a0a',
                 plot_bgcolor: '#0a0a0a',
                 font: {color: '#e0e0e0', size: 10},
-                xaxis: {gridcolor: '#1a1a1a', showgrid: true},
-                yaxis: {gridcolor: '#1a1a1a', showgrid: true},
-                margin: {l: 40, r: 20, t: 20, b: 40},
+                xaxis: {gridcolor: '#1a1a1a', showgrid: true, type: 'date'},
+                yaxis: {gridcolor: '#1a1a1a', showgrid: true, title: 'Z-Score', zeroline: false},
+                margin: {l: 50, r: 20, t: 20, b: 40},
                 showlegend: false,
                 shapes: [
-                    {type: 'line', x0: data[0].datetime, x1: data[data.length-1].datetime, y0: 1, y1: 1, line: {color: '#606060', dash: 'dash', width: 1}},
-                    {type: 'line', x0: data[0].datetime, x1: data[data.length-1].datetime, y0: -1, y1: -1, line: {color: '#606060', dash: 'dash', width: 1}},
-                    {type: 'line', x0: data[0].datetime, x1: data[data.length-1].datetime, y0: 2, y1: 2, line: {color: '#404040', dash: 'dot', width: 1}},
-                    {type: 'line', x0: data[0].datetime, x1: data[data.length-1].datetime, y0: -2, y1: -2, line: {color: '#404040', dash: 'dot', width: 1}}
-                ]
+                    {type: 'line', x0: datetimes[0], x1: datetimes[datetimes.length-1], 
+                     y0: 1, y1: 1, line: {color: '#606060', dash: 'dash', width: 1}},
+                    {type: 'line', x0: datetimes[0], x1: datetimes[datetimes.length-1], 
+                     y0: -1, y1: -1, line: {color: '#606060', dash: 'dash', width: 1}},
+                    {type: 'line', x0: datetimes[0], x1: datetimes[datetimes.length-1], 
+                     y0: 2, y1: 2, line: {color: '#404040', dash: 'dot', width: 1}},
+                    {type: 'line', x0: datetimes[0], x1: datetimes[datetimes.length-1], 
+                     y0: -2, y1: -2, line: {color: '#404040', dash: 'dot', width: 1}}
+                ],
+                hovermode: 'x'
             };
             
-            Plotly.newPlot('zScoreChart', [trace], layout, {responsive: true});
+            Plotly.newPlot('zScoreChart', [trace, zeroLine], layout, {responsive: true});
         }
 
         // Performance dashboard functions
