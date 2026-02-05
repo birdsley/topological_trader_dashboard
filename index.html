@@ -474,6 +474,28 @@
             padding: 20px;
         }
 
+        .show-more-btn {
+            background-color: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            color: #e0e0e0;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.2s;
+            margin-top: 15px;
+            width: 100%;
+            display: none;
+        }
+
+        .show-more-btn:hover {
+            background-color: #252525;
+        }
+
+        .show-more-btn.visible {
+            display: block;
+        }
+
         .tabs {
             display: flex;
             gap: 20px;
@@ -569,6 +591,26 @@
         .trade-reason.reversion {
             background-color: rgba(0, 168, 255, 0.2);
             color: #00a8ff;
+        }
+
+        .show-more-btn {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .show-more-btn button {
+            background-color: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            color: #e0e0e0;
+            padding: 10px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.2s;
+        }
+
+        .show-more-btn button:hover {
+            background-color: #252525;
         }
 
         .step-count {
@@ -1070,6 +1112,9 @@
                     <!-- Trades will be loaded here -->
                 </tbody>
             </table>
+            <div class="show-more-btn" id="showMoreContainer" style="display: none;">
+                <button onclick="toggleTradeView()">Show More</button>
+            </div>
         </div>
     </div>
 
@@ -1197,6 +1242,8 @@
         let availableDates = {};
         let selectedTicker = null;
         let currentHighlightIndex = -1;
+        let allTrades = [];
+        let showingAllTrades = false;
 
         // Main tab switching
         function switchMainTab(tabName) {
@@ -1822,13 +1869,15 @@
         function updateMetrics(equityCurve, trades, metrics) {
             if (equityCurve.length < 2) return;
             
+            // Normalize to $10,000 starting point
+            const BASELINE = 10000;
             const initialEquity = equityCurve[0].equity;
             const finalEquity = equityCurve[equityCurve.length - 1].equity;
-            const totalReturn = ((finalEquity - initialEquity) / initialEquity * 100).toFixed(2);
+            const totalReturn = ((finalEquity - initialEquity) / BASELINE * 100).toFixed(2);
             
             const initialBenchmark = equityCurve[0].benchmark;
             const finalBenchmark = equityCurve[equityCurve.length - 1].benchmark;
-            const benchmarkReturn = ((finalBenchmark - initialBenchmark) / initialBenchmark * 100).toFixed(2);
+            const benchmarkReturn = ((finalBenchmark - initialBenchmark) / BASELINE * 100).toFixed(2);
             
             const alpha = (totalReturn - benchmarkReturn).toFixed(2);
             
@@ -1841,6 +1890,17 @@
             const stdDev = Math.sqrt(returns.map(r => Math.pow(r - avgReturn, 2)).reduce((a, b) => a + b, 0) / returns.length);
             const sharpe = (avgReturn / stdDev * Math.sqrt(252)).toFixed(2);
             
+            // Calculate benchmark Sharpe
+            const benchmarkReturns = [];
+            for (let i = 1; i < equityCurve.length; i++) {
+                const ret = (equityCurve[i].benchmark - equityCurve[i-1].benchmark) / equityCurve[i-1].benchmark;
+                benchmarkReturns.push(ret);
+            }
+            const benchmarkAvgReturn = benchmarkReturns.reduce((a, b) => a + b, 0) / benchmarkReturns.length;
+            const benchmarkStdDev = Math.sqrt(benchmarkReturns.map(r => Math.pow(r - benchmarkAvgReturn, 2)).reduce((a, b) => a + b, 0) / benchmarkReturns.length);
+            const benchmarkSharpe = (benchmarkAvgReturn / benchmarkStdDev * Math.sqrt(252)).toFixed(2);
+            const sharpeDelta = (sharpe - benchmarkSharpe).toFixed(2);
+            
             let maxEquity = initialEquity;
             let maxDrawdown = 0;
             equityCurve.forEach(point => {
@@ -1848,6 +1908,16 @@
                 const drawdown = (point.equity - maxEquity) / maxEquity * 100;
                 if (drawdown < maxDrawdown) maxDrawdown = drawdown;
             });
+            
+            // Calculate benchmark drawdown
+            let maxBenchmark = initialBenchmark;
+            let maxBenchmarkDrawdown = 0;
+            equityCurve.forEach(point => {
+                if (point.benchmark > maxBenchmark) maxBenchmark = point.benchmark;
+                const drawdown = (point.benchmark - maxBenchmark) / maxBenchmark * 100;
+                if (drawdown < maxBenchmarkDrawdown) maxBenchmarkDrawdown = drawdown;
+            });
+            const drawdownDelta = (maxDrawdown - maxBenchmarkDrawdown).toFixed(2);
             
             const winningTrades = trades.filter(t => t.pnl > 0).length;
             const winRate = (winningTrades / trades.length * 100).toFixed(1);
@@ -1867,6 +1937,16 @@
             document.getElementById('longShort').textContent = longShortRatio;
             
             document.getElementById('returnDelta').textContent = alpha >= 0 ? `+${alpha}%` : `${alpha}%`;
+            document.getElementById('sharpeDelta').textContent = sharpeDelta >= 0 ? `+${sharpeDelta}` : `${sharpeDelta}`;
+            document.getElementById('drawdownDelta').textContent = drawdownDelta >= 0 ? `+${drawdownDelta}%` : `${drawdownDelta}%`;
+            
+            // ISSUE 2: Signal execution - currently not tracked in data
+            // Displaying 0% as data not available
+            document.getElementById('blockedSignals').textContent = '0.0%';
+            document.getElementById('executedPct').textContent = '0%';
+            document.getElementById('blockedPct').textContent = '0%';
+            document.getElementById('executedBar').style.width = '0%';
+            document.getElementById('blockedBar').style.width = '0%';
         }
 
         function updatePositions(positions, state) {
@@ -1922,9 +2002,20 @@
             document.getElementById('portfolioValue').textContent = `$${portfolioValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
         }
 
+        let showAllTrades = false;
+
         function updateTradesTable(trades) {
             const tradesBody = document.getElementById('tradesBody');
-            const tradesHTML = trades.slice(0, 50).map(trade => {
+            const showMoreContainer = document.getElementById('showMoreContainer');
+            
+            // Reverse to show most recent first
+            const reversedTrades = [...trades].reverse();
+            
+            // Determine how many to show
+            const limit = showAllTrades ? 30 : 10;
+            const tradesToShow = reversedTrades.slice(0, Math.min(limit, reversedTrades.length));
+            
+            const tradesHTML = tradesToShow.map(trade => {
                 const pnlClass = trade.pnl >= 0 ? 'positive' : 'negative';
                 const pnlSign = trade.pnl >= 0 ? '+' : '';
                 
@@ -1949,14 +2040,39 @@
             }).join('');
             
             tradesBody.innerHTML = tradesHTML;
+            
+            // Show/hide the "Show More" button
+            if (reversedTrades.length > 10) {
+                showMoreContainer.style.display = 'block';
+                const button = showMoreContainer.querySelector('button');
+                if (showAllTrades || reversedTrades.length <= 10) {
+                    button.style.display = 'none';
+                } else {
+                    button.style.display = 'block';
+                    const remaining = Math.min(reversedTrades.length - 10, 20);
+                    button.textContent = `Show More (${remaining} more trade${remaining > 1 ? 's' : ''})`;
+                }
+            } else {
+                showMoreContainer.style.display = 'none';
+            }
+        }
+
+        function toggleTradeView() {
+            showAllTrades = true;
+            // Reload trades data
+            loadData();
         }
 
         function updateEquityChart(data) {
             const ctx = document.getElementById('equityChart').getContext('2d');
             
+            const BASELINE = 10000;
+            const initialEquity = data[0].equity;
+            const initialBenchmark = data[0].benchmark;
+            
             const labels = data.map(d => d.date);
-            const strategyData = data.map(d => ((d.equity - data[0].equity) / data[0].equity * 100));
-            const benchmarkData = data.map(d => ((d.benchmark - data[0].benchmark) / data[0].benchmark * 100));
+            const strategyData = data.map(d => ((d.equity - initialEquity) / BASELINE * 100));
+            const benchmarkData = data.map(d => ((d.benchmark - initialBenchmark) / BASELINE * 100));
             
             if (equityChart) {
                 equityChart.destroy();
