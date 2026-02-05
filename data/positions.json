@@ -1,30 +1,37 @@
 {
+  "ABBV": {
+    "shares": 7.06,
+    "entry_price": 217.15,
+    "entry_date": "2026-02-04",
+    "signal": 1,
+    "side": 1
+  },
   "AES": {
-    "shares": -55.03,
-    "entry_price": 16.09,
-    "entry_date": "2026-02-03",
+    "shares": 81.7,
+    "entry_price": 15.75,
+    "entry_date": "2026-02-04",
+    "signal": 1,
+    "side": 1
+  },
+  "AMCR": {
+    "shares": -18.32,
+    "entry_price": 48.55,
+    "entry_date": "2026-02-04",
     "signal": -1,
     "side": -1
   },
-  "BALL": {
-    "shares": -14.33,
-    "entry_price": 61.76,
-    "entry_date": "2026-02-03",
+  "AMGN": {
+    "shares": -2.38,
+    "entry_price": 366.13,
+    "entry_date": "2026-02-04",
     "signal": -1,
     "side": -1
   },
-  "MPC": {
-    "shares": -5.48,
-    "entry_price": 187.54,
-    "entry_date": "2026-02-03",
-    "signal": -1,
-    "side": -1
-  },
-  "VLO": {
-    "shares": -5.23,
-    "entry_price": 192.23,
-    "entry_date": "2026-02-03",
-    "signal": -1,
-    "side": -1
+  "AMZN": {
+    "shares": 6.37,
+    "entry_price": 233.04,
+    "entry_date": "2026-02-04",
+    "signal": 1,
+    "side": 1
   }
 }
