@@ -1873,9 +1873,9 @@
             const BASELINE = 10000;
             const initialEquity = equityCurve[0].equity;
             const finalEquity = equityCurve[equityCurve.length - 1].equity;
-            const totalReturn = ((finalEquity - initialEquity) / BASELINE * 100).toFixed(2);
+            const totalReturn = ((finalEquity - 10000) / 10000 * 100).toFixed(2);
             
-            const initialBenchmark = equityCurve[0].benchmark;
+            const initialBenchmark = 10000;
             const finalBenchmark = equityCurve[equityCurve.length - 1].benchmark;
             const benchmarkReturn = ((finalBenchmark - initialBenchmark) / BASELINE * 100).toFixed(2);
             
