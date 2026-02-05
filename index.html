@@ -1869,13 +1869,13 @@
         function updateMetrics(equityCurve, trades, metrics) {
             if (equityCurve.length < 2) return;
             
-            // Normalize to $10,000 starting point
-            const BASELINE = 10000;
+            // Normalize to $10150.59 starting point
+            const BASELINE = 10150.59;
             const initialEquity = equityCurve[0].equity;
             const finalEquity = equityCurve[equityCurve.length - 1].equity;
-            const totalReturn = ((finalEquity - 10000) / 10000 * 100).toFixed(2);
+            const totalReturn = ((finalEquity - 10150.59) / 10150.59 * 100).toFixed(2);
             
-            const initialBenchmark = 10000;
+            const initialBenchmark = 10150.59;
             const finalBenchmark = equityCurve[equityCurve.length - 1].benchmark;
             const benchmarkReturn = ((finalBenchmark - initialBenchmark) / BASELINE * 100).toFixed(2);
             
