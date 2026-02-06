@@ -1,36 +1,36 @@
 {
-  "ABBV": {
-    "shares": 7.06,
-    "entry_price": 217.15,
-    "entry_date": "2026-02-04",
+  "BSX": {
+    "shares": 17.17,
+    "entry_price": 76.29,
+    "entry_date": "2026-02-06",
     "signal": 1,
     "side": 1
   },
-  "AES": {
-    "shares": 81.7,
-    "entry_price": 15.75,
-    "entry_date": "2026-02-04",
+  "CEG": {
+    "shares": -3.33,
+    "entry_price": 261.37,
+    "entry_date": "2026-02-06",
+    "signal": -1,
+    "side": -1
+  },
+  "CNC": {
+    "shares": 31.5,
+    "entry_price": 38.47,
+    "entry_date": "2026-02-06",
     "signal": 1,
     "side": 1
   },
-  "AMCR": {
-    "shares": -18.32,
-    "entry_price": 48.55,
-    "entry_date": "2026-02-04",
+  "COIN": {
+    "shares": -5.61,
+    "entry_price": 165.09,
+    "entry_date": "2026-02-06",
     "signal": -1,
     "side": -1
   },
-  "AMGN": {
-    "shares": -2.38,
-    "entry_price": 366.13,
-    "entry_date": "2026-02-04",
-    "signal": -1,
-    "side": -1
-  },
-  "AMZN": {
-    "shares": 6.37,
-    "entry_price": 233.04,
-    "entry_date": "2026-02-04",
+  "CSGP": {
+    "shares": 26.75,
+    "entry_price": 50.29,
+    "entry_date": "2026-02-06",
     "signal": 1,
     "side": 1
   }
