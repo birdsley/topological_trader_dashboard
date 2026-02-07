@@ -593,26 +593,6 @@
             color: #00a8ff;
         }
 
-        .show-more-btn {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .show-more-btn button {
-            background-color: #1a1a1a;
-            border: 1px solid #2a2a2a;
-            color: #e0e0e0;
-            padding: 10px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: background-color 0.2s;
-        }
-
-        .show-more-btn button:hover {
-            background-color: #252525;
-        }
-
         .step-count {
             text-align: center;
             font-size: 12px;
@@ -948,7 +928,7 @@
             </select>
             <div class="commit-info">
                 <span style="color: #00d4aa;">Status: OK</span>
-                <span style="margin-left: 15px;">Commit: <span id="commitHash">42e2e5a</span></span>
+                <span style="margin-left: 15px;">Commit: <span id="commitHash">a1b2c3d</span></span>
             </div>
         </div>
 
@@ -1042,11 +1022,12 @@
 
             <div class="diagnostic-card">
                 <div class="chart-title">Signal Execution</div>
+                <div class="chart-subtitle" style="margin-bottom: 20px; color: #ff9f43;">Data not currently tracked</div>
                 <div class="signal-bars">
                     <div class="signal-bar-item">
                         <div class="signal-bar-label">
                             <span>Executed</span>
-                            <span style="color: #00d4aa;" id="executedPct">0%</span>
+                            <span style="color: #00d4aa;" id="executedPct">-</span>
                         </div>
                         <div class="signal-bar">
                             <div class="signal-bar-fill" id="executedBar" style="width: 0%;"></div>
@@ -1055,15 +1036,21 @@
                     <div class="signal-bar-item">
                         <div class="signal-bar-label">
                             <span>Blocked</span>
-                            <span style="color: #808080;" id="blockedPct">0%</span>
+                            <span style="color: #808080;" id="blockedPct">-</span>
                         </div>
                         <div class="signal-bar">
                             <div class="signal-bar-fill" id="blockedBar" style="width: 0%; background: #606060;"></div>
                         </div>
                     </div>
                 </div>
-                <div class="diagnostic-stats" id="diagnosticStats">
-                    <!-- Will be populated dynamically -->
+                <div style="text-align: center; margin-top: 20px; padding: 15px; background-color: #0f0f0f; border-radius: 6px;">
+                    <div style="font-size: 11px; color: #808080; line-height: 1.5;">
+                        Signal filtering metrics require logging of:<br>
+                        • Total signals generated<br>
+                        • Signals blocked by uncertainty filter<br>
+                        • Signals executed as trades<br>
+                        <span style="color: #ff9f43; font-weight: 500; margin-top: 8px; display: block;">Add signal tracking to enable this feature</span>
+                    </div>
                 </div>
                 <div class="chart-subtitle" style="text-align: center; margin-top: 20px;"><span id="totalSignals">0</span> total signals</div>
             </div>
@@ -1112,9 +1099,7 @@
                     <!-- Trades will be loaded here -->
                 </tbody>
             </table>
-            <div class="show-more-btn" id="showMoreContainer" style="display: none;">
-                <button onclick="toggleTradeView()">Show More</button>
-            </div>
+            <button class="show-more-btn" id="showMoreBtn" onclick="toggleTradeView()">Show More (20 more trades)</button>
         </div>
     </div>
 
@@ -1869,15 +1854,15 @@
         function updateMetrics(equityCurve, trades, metrics) {
             if (equityCurve.length < 2) return;
             
-            // Normalize to $10000 starting point
-            const BASELINE = 10000.00;
+            // Normalize to $10,000 starting point
+            const baselineEquity = 10000;
             const initialEquity = equityCurve[0].equity;
             const finalEquity = equityCurve[equityCurve.length - 1].equity;
-            const totalReturn = ((finalEquity - 10000.00) / 10000.00 * 100).toFixed(2);
+            const totalReturn = ((finalEquity - baselineEquity) / baselineEquity * 100).toFixed(2);
             
-            const initialBenchmark = 10000.00;
+            const initialBenchmark = equityCurve[0].benchmark;
             const finalBenchmark = equityCurve[equityCurve.length - 1].benchmark;
-            const benchmarkReturn = ((finalBenchmark - initialBenchmark) / BASELINE * 100).toFixed(2);
+            const benchmarkReturn = ((finalBenchmark - initialBenchmark) / initialBenchmark * 100).toFixed(2);
             
             const alpha = (totalReturn - benchmarkReturn).toFixed(2);
             
@@ -1901,7 +1886,7 @@
             const benchmarkSharpe = (benchmarkAvgReturn / benchmarkStdDev * Math.sqrt(252)).toFixed(2);
             const sharpeDelta = (sharpe - benchmarkSharpe).toFixed(2);
             
-            let maxEquity = initialEquity;
+            let maxEquity = baselineEquity;
             let maxDrawdown = 0;
             equityCurve.forEach(point => {
                 if (point.equity > maxEquity) maxEquity = point.equity;
@@ -1939,14 +1924,6 @@
             document.getElementById('returnDelta').textContent = alpha >= 0 ? `+${alpha}%` : `${alpha}%`;
             document.getElementById('sharpeDelta').textContent = sharpeDelta >= 0 ? `+${sharpeDelta}` : `${sharpeDelta}`;
             document.getElementById('drawdownDelta').textContent = drawdownDelta >= 0 ? `+${drawdownDelta}%` : `${drawdownDelta}%`;
-            
-            // ISSUE 2: Signal execution - currently not tracked in data
-            // Displaying 0% as data not available
-            document.getElementById('blockedSignals').textContent = '0.0%';
-            document.getElementById('executedPct').textContent = '0%';
-            document.getElementById('blockedPct').textContent = '0%';
-            document.getElementById('executedBar').style.width = '0%';
-            document.getElementById('blockedBar').style.width = '0%';
         }
 
         function updatePositions(positions, state) {
@@ -2002,18 +1979,24 @@
             document.getElementById('portfolioValue').textContent = `$${portfolioValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
         }
 
-        let showAllTrades = false;
+        function toggleTradeView() {
+            showingAllTrades = !showingAllTrades;
+            updateTradesTable(allTrades);
+        }
 
         function updateTradesTable(trades) {
+            allTrades = trades;
             const tradesBody = document.getElementById('tradesBody');
-            const showMoreContainer = document.getElementById('showMoreContainer');
+            const showMoreBtn = document.getElementById('showMoreBtn');
             
-            // Reverse to show most recent first
-            const reversedTrades = [...trades].reverse();
+            // Sort by exit_date descending (most recent first)
+            const sortedTrades = [...trades].sort((a, b) => {
+                return new Date(b.exit_date) - new Date(a.exit_date);
+            });
             
-            // Determine how many to show
-            const limit = showAllTrades ? 30 : 10;
-            const tradesToShow = reversedTrades.slice(0, Math.min(limit, reversedTrades.length));
+            // Determine how many trades to show
+            const displayCount = showingAllTrades ? Math.min(30, sortedTrades.length) : Math.min(10, sortedTrades.length);
+            const tradesToShow = sortedTrades.slice(0, displayCount);
             
             const tradesHTML = tradesToShow.map(trade => {
                 const pnlClass = trade.pnl >= 0 ? 'positive' : 'negative';
@@ -2041,38 +2024,27 @@
             
             tradesBody.innerHTML = tradesHTML;
             
-            // Show/hide the "Show More" button
-            if (reversedTrades.length > 10) {
-                showMoreContainer.style.display = 'block';
-                const button = showMoreContainer.querySelector('button');
-                if (showAllTrades || reversedTrades.length <= 10) {
-                    button.style.display = 'none';
+            // Show/hide and update button text
+            if (sortedTrades.length > 10) {
+                showMoreBtn.classList.add('visible');
+                if (showingAllTrades) {
+                    showMoreBtn.textContent = 'Show Less';
                 } else {
-                    button.style.display = 'block';
-                    const remaining = Math.min(reversedTrades.length - 10, 20);
-                    button.textContent = `Show More (${remaining} more trade${remaining > 1 ? 's' : ''})`;
+                    const remaining = Math.min(20, sortedTrades.length - 10);
+                    showMoreBtn.textContent = `Show More (${remaining} more trade${remaining !== 1 ? 's' : ''})`;
                 }
             } else {
-                showMoreContainer.style.display = 'none';
+                showMoreBtn.classList.remove('visible');
             }
-        }
-
-        function toggleTradeView() {
-            showAllTrades = true;
-            // Reload trades data
-            loadData();
         }
 
         function updateEquityChart(data) {
             const ctx = document.getElementById('equityChart').getContext('2d');
             
-            const BASELINE = 10000;
-            const initialEquity = data[0].equity;
-            const initialBenchmark = data[0].benchmark;
-            
+            const baselineEquity = 10000;
             const labels = data.map(d => d.date);
-            const strategyData = data.map(d => ((d.equity - initialEquity) / BASELINE * 100));
-            const benchmarkData = data.map(d => ((d.benchmark - initialBenchmark) / BASELINE * 100));
+            const strategyData = data.map(d => ((d.equity - baselineEquity) / baselineEquity * 100));
+            const benchmarkData = data.map(d => ((d.benchmark - data[0].benchmark) / data[0].benchmark * 100));
             
             if (equityChart) {
                 equityChart.destroy();
@@ -2184,7 +2156,24 @@
             
             const labels = Object.keys(reasons);
             const data = Object.values(reasons);
-            const colors = ['#ff4757', '#2ed573', '#00d4aa', '#ffa502', '#1e90ff'];
+            
+            // Map specific exit reasons to colors
+            // ATR Stop = red, Residual Reversion = green, Time = blue
+            const colorMap = {
+                'ATR Stop': '#ff4757',
+                'Residual Reversion': '#2ed573',
+                'Time': '#1e90ff',
+                'Profit Target': '#00d4aa',
+                'default': '#ffa502'
+            };
+            
+            const colors = labels.map(label => {
+                if (label.includes('ATR')) return colorMap['ATR Stop'];
+                if (label.includes('Reversion')) return colorMap['Residual Reversion'];
+                if (label.includes('Time')) return colorMap['Time'];
+                if (label.includes('Profit')) return colorMap['Profit Target'];
+                return colorMap['default'];
+            });
             
             if (exitReasonsChart) {
                 exitReasonsChart.destroy();
@@ -2196,7 +2185,7 @@
                     labels: labels,
                     datasets: [{
                         data: data,
-                        backgroundColor: colors.slice(0, labels.length),
+                        backgroundColor: colors,
                         borderWidth: 0
                     }]
                 },
