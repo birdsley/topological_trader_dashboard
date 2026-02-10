@@ -1,37 +1,37 @@
 {
-  "BSX": {
-    "shares": 17.17,
-    "entry_price": 76.29,
-    "entry_date": "2026-02-06",
+  "ACGL": {
+    "shares": 13.84,
+    "entry_price": 96.08,
+    "entry_date": "2026-02-09",
     "signal": 1,
     "side": 1
   },
-  "CEG": {
-    "shares": -3.33,
-    "entry_price": 261.37,
-    "entry_date": "2026-02-06",
+  "AFL": {
+    "shares": 12.04,
+    "entry_price": 113.22,
+    "entry_date": "2026-02-09",
+    "signal": 1,
+    "side": 1
+  },
+  "AIZ": {
+    "shares": 5.79,
+    "entry_price": 235.37,
+    "entry_date": "2026-02-09",
+    "signal": 1,
+    "side": 1
+  },
+  "GL": {
+    "shares": 9.76,
+    "entry_price": 141.45,
+    "entry_date": "2026-02-09",
+    "signal": 1,
+    "side": 1
+  },
+  "IT": {
+    "shares": -5.53,
+    "entry_price": 159.72,
+    "entry_date": "2026-02-09",
     "signal": -1,
     "side": -1
-  },
-  "CNC": {
-    "shares": 31.5,
-    "entry_price": 38.47,
-    "entry_date": "2026-02-06",
-    "signal": 1,
-    "side": 1
-  },
-  "COIN": {
-    "shares": -5.61,
-    "entry_price": 165.09,
-    "entry_date": "2026-02-06",
-    "signal": -1,
-    "side": -1
-  },
-  "CSGP": {
-    "shares": 26.75,
-    "entry_price": 50.29,
-    "entry_date": "2026-02-06",
-    "signal": 1,
-    "side": 1
   }
 }
