@@ -1,0 +1,15 @@
+{
+  "total_signals_generated": 2,
+  "signals_executed": 2,
+  "execution_rate": 100.0,
+  "uncertainty_block_rate": 0.0,
+  "confidence_block_rate": 0.0,
+  "trend_veto_rate": 0.0,
+  "avg_tga_confidence": 0.591,
+  "avg_lstm_confidence": 1.0,
+  "avg_combined_confidence": 0.796,
+  "avg_kelly_fraction": 0.473,
+  "long_signals": 0,
+  "short_signals": 2,
+  "long_short_ratio": 0.0
+}
