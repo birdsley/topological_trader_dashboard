@@ -1,16 +1,37 @@
 {
-  "AFL": {
-    "shares": -7.46,
-    "entry_price": 115.86,
-    "entry_date": "2026-02-10",
-    "signal": -1,
-    "side": -1
+  "ADBE": {
+    "shares": 5.18,
+    "entry_price": 257.21,
+    "entry_date": "2026-02-11",
+    "signal": 1,
+    "side": 1
   },
-  "DDOG": {
-    "shares": -7.46,
-    "entry_price": 129.64,
-    "entry_date": "2026-02-10",
-    "signal": -1,
-    "side": -1
+  "ADP": {
+    "shares": 6.89,
+    "entry_price": 217.61,
+    "entry_date": "2026-02-11",
+    "signal": 1,
+    "side": 1
+  },
+  "ADSK": {
+    "shares": 6.24,
+    "entry_price": 232.64,
+    "entry_date": "2026-02-11",
+    "signal": 1,
+    "side": 1
+  },
+  "AIZ": {
+    "shares": 7.17,
+    "entry_price": 216.05,
+    "entry_date": "2026-02-11",
+    "signal": 1,
+    "side": 1
+  },
+  "AJG": {
+    "shares": 6.69,
+    "entry_price": 205.35,
+    "entry_date": "2026-02-11",
+    "signal": 1,
+    "side": 1
   }
 }
