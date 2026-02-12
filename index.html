@@ -1303,18 +1303,18 @@
 
         <div class="diagnostics-container" style="margin-top: 30px;">
             <div class="diagnostic-card">
-                <div class="chart-title">Position Sizing Distribution</div>
-                <div class="chart-subtitle" style="margin-bottom: 20px;">Kelly fraction usage</div>
+                <div class="chart-title">Market Regime Timeline</div>
+                <div class="chart-subtitle" style="margin-bottom: 20px;">Regime evolution over time</div>
                 <div style="height: 250px;">
-                    <canvas id="kellySizingChart"></canvas>
+                    <canvas id="regimeTimelineChart"></canvas>
                 </div>
             </div>
 
             <div class="diagnostic-card">
-                <div class="chart-title">Regime Distribution</div>
-                <div class="chart-subtitle" style="margin-bottom: 20px;">Market conditions observed</div>
+                <div class="chart-title">Confidence Distribution</div>
+                <div class="chart-subtitle" style="margin-bottom: 20px;">TGA vs LSTM confidence levels</div>
                 <div style="height: 250px;">
-                    <canvas id="regimeChart"></canvas>
+                    <canvas id="confidenceDistributionChart"></canvas>
                 </div>
             </div>
         </div>
@@ -1324,6 +1324,43 @@
             <div class="chart-subtitle" style="margin-bottom: 20px;">From raw signals to executed trades</div>
             <div style="height: 300px;">
                 <canvas id="signalFunnelChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="diagnostics-container" style="margin-top: 20px;">
+            <div class="diagnostic-card">
+                <div class="chart-title">Daily Activity</div>
+                <div class="chart-subtitle" style="margin-bottom: 20px;">Signals vs Trades</div>
+                <div style="height: 250px;">
+                    <canvas id="dailyActivityChart"></canvas>
+                </div>
+            </div>
+
+            <div class="diagnostic-card">
+                <div class="chart-title">Market Conditions</div>
+                <div class="chart-subtitle" style="margin-bottom: 20px;">Volatility & drift metrics</div>
+                <div class="diagnostic-stats">
+                    <div class="diagnostic-stat">
+                        <div class="diagnostic-stat-value" id="avgMu">0.00</div>
+                        <div class="diagnostic-stat-label">Avg Drift (μ)</div>
+                    </div>
+                    <div class="diagnostic-stat">
+                        <div class="diagnostic-stat-value" id="avgSigma">0.00</div>
+                        <div class="diagnostic-stat-label">Avg Vol (σ)</div>
+                    </div>
+                    <div class="diagnostic-stat">
+                        <div class="diagnostic-stat-value" id="avgDelta">0.00</div>
+                        <div class="diagnostic-stat-label">Jump Freq (δ)</div>
+                    </div>
+                    <div class="diagnostic-stat">
+                        <div class="diagnostic-stat-value" id="avgDispersion">0.00</div>
+                        <div class="diagnostic-stat-label">Dispersion</div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background-color: #0f0f0f; border-radius: 6px;">
+                    <div style="font-size: 11px; color: #808080; margin-bottom: 8px;">Current Regime</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #00d4aa;" id="currentRegime">STRONG_BULL</div>
+                </div>
             </div>
         </div>
     </div>
@@ -1449,9 +1486,10 @@
         let exitReasonsChart;
         let pnlDistributionChart;
         let longShortChart;
-        let kellySizingChart;
-        let regimeChart;
+        let regimeTimelineChart;
+        let confidenceDistributionChart;
         let signalFunnelChart;
+        let dailyActivityChart;
         let allTrades = [];
         let showingAllTrades = false;
         let signalAnalytics = null;
@@ -1718,11 +1756,15 @@
             document.getElementById('strategyLongSignals').textContent = data.long_signals;
             document.getElementById('strategyShortSignals').textContent = data.short_signals;
 
+            // Load regime history and daily summary
+            loadRegimeHistory();
+            loadDailySummary();
+
             // Signal Funnel Chart
             const funnelData = [
                 data.total_signals_generated,
-                data.total_signals_generated - data.blocked_by_uncertainty,
-                data.total_signals_generated - data.blocked_by_uncertainty - data.blocked_by_confidence,
+                data.total_signals_generated - (data.total_signals_generated * data.uncertainty_block_rate / 100),
+                data.total_signals_generated - (data.total_signals_generated * data.uncertainty_block_rate / 100) - (data.total_signals_generated * data.confidence_block_rate / 100),
                 data.signals_executed
             ];
 
@@ -1771,6 +1813,237 @@
                     }
                 }
             });
+
+            // Confidence Distribution Chart
+            if (confidenceDistributionChart) confidenceDistributionChart.destroy();
+            const ctx2 = document.getElementById('confidenceDistributionChart').getContext('2d');
+            confidenceDistributionChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['TGA', 'LSTM', 'Combined'],
+                    datasets: [{
+                        label: 'Confidence',
+                        data: [data.avg_tga_confidence, data.avg_lstm_confidence, data.avg_combined_confidence],
+                        backgroundColor: ['rgba(0, 168, 255, 0.7)', 'rgba(0, 212, 170, 0.7)', 'rgba(255, 159, 67, 0.7)'],
+                        borderColor: ['#00a8ff', '#00d4aa', '#ff9f43'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1a1a1a',
+                            titleColor: '#ffffff',
+                            bodyColor: '#e0e0e0',
+                            borderColor: '#2a2a2a',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            max: 1.0,
+                            grid: { color: '#1a1a1a' },
+                            ticks: { color: '#808080' }
+                        },
+                        x: { 
+                            grid: { color: '#1a1a1a' },
+                            ticks: { color: '#808080' }
+                        }
+                    }
+                }
+            });
+        }
+
+        let regimeTimelineChart, confidenceDistributionChart, dailyActivityChart;
+
+        async function loadRegimeHistory() {
+            try {
+                const response = await fetch('data/regime_history.csv');
+                const text = await response.text();
+                
+                Papa.parse(text, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    complete: (results) => {
+                        const data = results.data;
+                        
+                        if (data.length === 0) return;
+
+                        // Update market condition stats
+                        const avgMu = (data.reduce((sum, d) => sum + d.mu, 0) / data.length * 100).toFixed(2);
+                        const avgSigma = (data.reduce((sum, d) => sum + d.sigma, 0) / data.length * 100).toFixed(2);
+                        const avgDelta = (data.reduce((sum, d) => sum + d.delta, 0) / data.length).toFixed(3);
+                        const avgDispersion = (data.reduce((sum, d) => sum + d.dispersion, 0) / data.length).toFixed(3);
+                        
+                        document.getElementById('avgMu').textContent = avgMu + '%';
+                        document.getElementById('avgSigma').textContent = avgSigma + '%';
+                        document.getElementById('avgDelta').textContent = avgDelta;
+                        document.getElementById('avgDispersion').textContent = avgDispersion;
+                        document.getElementById('currentRegime').textContent = data[data.length - 1].regime;
+
+                        // Create regime timeline chart
+                        const regimeColors = {
+                            'STRONG_BULL': 'rgba(0, 212, 170, 0.8)',
+                            'BULL': 'rgba(0, 212, 170, 0.6)',
+                            'NEUTRAL': 'rgba(128, 128, 128, 0.6)',
+                            'BEAR': 'rgba(255, 71, 87, 0.6)',
+                            'STRONG_BEAR': 'rgba(255, 71, 87, 0.8)',
+                            'CRASH_RISK': 'rgba(255, 0, 0, 0.9)'
+                        };
+
+                        const regimeValues = data.map(d => {
+                            if (d.regime === 'STRONG_BULL') return 2;
+                            if (d.regime === 'BULL') return 1;
+                            if (d.regime === 'NEUTRAL') return 0;
+                            if (d.regime === 'BEAR') return -1;
+                            if (d.regime === 'STRONG_BEAR') return -2;
+                            if (d.regime === 'CRASH_RISK') return -3;
+                            return 0;
+                        });
+
+                        if (regimeTimelineChart) regimeTimelineChart.destroy();
+                        const ctx = document.getElementById('regimeTimelineChart').getContext('2d');
+                        regimeTimelineChart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: data.map(d => d.date),
+                                datasets: [{
+                                    label: 'Regime',
+                                    data: regimeValues,
+                                    borderColor: '#00d4aa',
+                                    backgroundColor: data.map(d => regimeColors[d.regime] || 'rgba(128, 128, 128, 0.6)'),
+                                    borderWidth: 2,
+                                    fill: true,
+                                    stepped: true,
+                                    pointRadius: 4,
+                                    pointHoverRadius: 6
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: false },
+                                    tooltip: {
+                                        backgroundColor: '#1a1a1a',
+                                        titleColor: '#ffffff',
+                                        bodyColor: '#e0e0e0',
+                                        borderColor: '#2a2a2a',
+                                        borderWidth: 1,
+                                        callbacks: {
+                                            label: function(context) {
+                                                return data[context.dataIndex].regime;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    y: { 
+                                        ticks: {
+                                            color: '#808080',
+                                            callback: function(value) {
+                                                const labels = {2: 'STRONG_BULL', 1: 'BULL', 0: 'NEUTRAL', '-1': 'BEAR', '-2': 'STRONG_BEAR', '-3': 'CRASH'};
+                                                return labels[value] || '';
+                                            }
+                                        },
+                                        grid: { color: '#1a1a1a' }
+                                    },
+                                    x: { 
+                                        grid: { color: '#1a1a1a' },
+                                        ticks: { color: '#808080', maxTicksLimit: 6 }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            } catch (e) {
+                console.error('Error loading regime history:', e);
+            }
+        }
+
+        async function loadDailySummary() {
+            try {
+                const response = await fetch('data/daily_summary.csv');
+                const text = await response.text();
+                
+                Papa.parse(text, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    complete: (results) => {
+                        const data = results.data;
+                        
+                        if (data.length === 0) return;
+
+                        if (dailyActivityChart) dailyActivityChart.destroy();
+                        const ctx = document.getElementById('dailyActivityChart').getContext('2d');
+                        dailyActivityChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: data.map(d => d.date),
+                                datasets: [
+                                    {
+                                        label: 'Signals Generated',
+                                        data: data.map(d => d.signals_generated),
+                                        backgroundColor: 'rgba(0, 168, 255, 0.7)',
+                                        borderColor: '#00a8ff',
+                                        borderWidth: 1
+                                    },
+                                    {
+                                        label: 'Signals Executed',
+                                        data: data.map(d => d.signals_executed),
+                                        backgroundColor: 'rgba(0, 212, 170, 0.7)',
+                                        borderColor: '#00d4aa',
+                                        borderWidth: 1
+                                    },
+                                    {
+                                        label: 'Trades Closed',
+                                        data: data.map(d => d.trades_closed),
+                                        backgroundColor: 'rgba(255, 159, 67, 0.7)',
+                                        borderColor: '#ff9f43',
+                                        borderWidth: 1
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { 
+                                        labels: { color: '#e0e0e0', font: { size: 10 } }
+                                    },
+                                    tooltip: {
+                                        backgroundColor: '#1a1a1a',
+                                        titleColor: '#ffffff',
+                                        bodyColor: '#e0e0e0',
+                                        borderColor: '#2a2a2a',
+                                        borderWidth: 1
+                                    }
+                                },
+                                scales: {
+                                    y: { 
+                                        beginAtZero: true,
+                                        grid: { color: '#1a1a1a' },
+                                        ticks: { color: '#808080' }
+                                    },
+                                    x: { 
+                                        grid: { color: '#1a1a1a' },
+                                        ticks: { color: '#808080', maxTicksLimit: 8 }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            } catch (e) {
+                console.error('Error loading daily summary:', e);
+            }
         }
 
         function updateMetrics(equityCurve, trades, metrics) {
@@ -1852,8 +2125,13 @@
             document.getElementById('stepCount').textContent = state.step_count;
             document.getElementById('positionsUpdate').textContent = state.last_run_date || '-';
             
+            // Calculate total portfolio value first
             let portfolioValue = cash;
             const positionsArray = Object.entries(positions);
+            
+            positionsArray.forEach(([ticker, position]) => {
+                portfolioValue += position.shares * position.entry_price;
+            });
             
             if (positionsArray.length === 0) {
                 positionsList.innerHTML = '<div class="no-data-message" style="padding: 20px; text-align: center; color: #606060;">No open positions</div>';
@@ -1861,10 +2139,10 @@
                 return;
             }
             
+            // Now calculate percentages based on total portfolio value
             const positionsHTML = positionsArray.map(([ticker, position]) => {
                 const positionValue = Math.abs(position.shares * position.entry_price);
-                portfolioValue += position.shares * position.entry_price;
-                const percentage = (positionValue / (cash + positionValue) * 100).toFixed(1);
+                const percentage = (positionValue / portfolioValue * 100).toFixed(1);
                 
                 return `
                     <div class="position-item">
