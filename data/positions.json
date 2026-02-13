@@ -1,37 +1,23 @@
 {
-  "ADBE": {
-    "shares": 5.18,
-    "entry_price": 257.21,
-    "entry_date": "2026-02-11",
+  "PLTR": {
+    "shares": 8.35,
+    "entry_price": 129.16,
+    "entry_date": "2026-02-12",
     "signal": 1,
     "side": 1
   },
-  "ADP": {
-    "shares": 6.89,
-    "entry_price": 217.61,
-    "entry_date": "2026-02-11",
-    "signal": 1,
-    "side": 1
+  "SBAC": {
+    "shares": -3.36,
+    "entry_price": 199.25,
+    "entry_date": "2026-02-12",
+    "signal": -1,
+    "side": -1
   },
-  "ADSK": {
-    "shares": 6.24,
-    "entry_price": 232.64,
-    "entry_date": "2026-02-11",
-    "signal": 1,
-    "side": 1
-  },
-  "AIZ": {
-    "shares": 7.17,
-    "entry_price": 216.05,
-    "entry_date": "2026-02-11",
-    "signal": 1,
-    "side": 1
-  },
-  "AJG": {
-    "shares": 6.69,
-    "entry_price": 205.35,
-    "entry_date": "2026-02-11",
-    "signal": 1,
-    "side": 1
+  "TJX": {
+    "shares": -5.6,
+    "entry_price": 154.15,
+    "entry_date": "2026-02-12",
+    "signal": -1,
+    "side": -1
   }
 }
