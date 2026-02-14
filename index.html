@@ -108,7 +108,6 @@
             background-color: #252525;
         }
 
-        /* Main Tabs */
         .main-tabs {
             display: flex;
             gap: 30px;
@@ -659,7 +658,6 @@
             border-radius: 2px;
         }
 
-        /* Trade Analytics Styles */
         .analytics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -713,7 +711,61 @@
             margin-top: 10px;
         }
 
-        /* Ticker Analysis Styles */
+        /* REGIME BADGE STYLES - NEW */
+        .regime-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .regime-badge.strong-bull {
+            background-color: rgba(0, 212, 170, 0.2);
+            color: #00d4aa;
+        }
+
+        .regime-badge.weak-bull {
+            background-color: rgba(0, 212, 170, 0.1);
+            color: #00d4aa;
+        }
+
+        .regime-badge.strong-bear {
+            background-color: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+        }
+
+        .regime-badge.weak-bear {
+            background-color: rgba(255, 71, 87, 0.1);
+            color: #ff4757;
+        }
+
+        .regime-badge.neutral {
+            background-color: rgba(255, 159, 67, 0.2);
+            color: #ff9f43;
+        }
+
+        .regime-stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .regime-stat-label {
+            font-size: 12px;
+            color: #808080;
+        }
+
+        .regime-stat-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
         .ticker-controls {
             background-color: #1a1a1a;
             border: 1px solid #2a2a2a;
@@ -753,7 +805,6 @@
             border-color: #00d4aa;
         }
 
-        /* Autocomplete Styles */
         .autocomplete-container {
             position: relative;
             width: 100%;
@@ -973,14 +1024,12 @@
         </div>
     </div>
 
-    <!-- Main Navigation Tabs -->
     <div class="main-tabs">
         <div class="main-tab active" onclick="switchMainTab('performance')">Performance Dashboard</div>
         <div class="main-tab" onclick="switchMainTab('analytics')">Strategy Analytics</div>
         <div class="main-tab" onclick="switchMainTab('ticker')">Ticker Analysis</div>
     </div>
 
-    <!-- Performance Dashboard Tab -->
     <div id="performance-tab" class="tab-content active">
         <div class="strategy-selector">
             <div class="logo-icon" style="width: 20px; height: 20px;">
@@ -1172,7 +1221,6 @@
                 <div class="tab" onclick="switchTradeTab('analytics')">Trade Analytics</div>
             </div>
             
-            <!-- Trade Log Tab -->
             <div id="tradeLogContent" class="trade-tab-content">
                 <div class="chart-title" style="margin-bottom: 20px;">Trade Log</div>
                 <div class="chart-subtitle" style="margin-bottom: 20px;"><span id="tradeCount">0</span> trades</div>
@@ -1195,7 +1243,6 @@
                 <button class="show-more-btn" id="showMoreBtn" onclick="toggleTradeView()">Show More</button>
             </div>
 
-            <!-- Trade Analytics Tab -->
             <div id="tradeAnalyticsContent" class="trade-tab-content" style="display: none;">
                 <div class="chart-title" style="margin-bottom: 20px;">Trade Analytics</div>
                 <div class="analytics-grid">
@@ -1264,7 +1311,6 @@
         </div>
     </div>
 
-    <!-- Strategy Analytics Tab -->
     <div id="analytics-tab" class="tab-content">
         <div class="strategy-selector">
             <div class="logo-icon" style="width: 20px; height: 20px;">
@@ -1277,7 +1323,7 @@
             <label>Strategy Deep Dive</label>
         </div>
 
-        <div class="chart-title" style="margin-bottom: 20px;">Signal Generation & Filtering</div>
+        <div class="chart-title" style="margin-bottom: 20px;">Signal Generation & Model Performance</div>
         <div class="analytics-grid">
             <div class="analytics-stat-card">
                 <div class="analytics-stat-label">TGA Confidence</div>
@@ -1303,18 +1349,19 @@
 
         <div class="diagnostics-container" style="margin-top: 30px;">
             <div class="diagnostic-card">
-                <div class="chart-title">Position Sizing Distribution</div>
-                <div class="chart-subtitle" style="margin-bottom: 20px;">Kelly fraction usage</div>
-                <div style="height: 250px;">
-                    <canvas id="kellySizingChart"></canvas>
+                <div class="chart-title">Current Market Regime</div>
+                <div class="chart-subtitle" style="margin-bottom: 20px;">Live regime detection</div>
+                <div id="currentRegimeDisplay" style="text-align: center; padding: 20px;">
+                    <div id="regimeBadgeContainer" style="margin-bottom: 20px;"></div>
+                    <div id="regimeStats"></div>
                 </div>
             </div>
 
             <div class="diagnostic-card">
-                <div class="chart-title">Regime Distribution</div>
-                <div class="chart-subtitle" style="margin-bottom: 20px;">Market conditions observed</div>
+                <div class="chart-title">Model Confidence Distribution</div>
+                <div class="chart-subtitle" style="margin-bottom: 20px;">TGA vs LSTM signals</div>
                 <div style="height: 250px;">
-                    <canvas id="regimeChart"></canvas>
+                    <canvas id="confidenceDistChart"></canvas>
                 </div>
             </div>
         </div>
@@ -1326,9 +1373,16 @@
                 <canvas id="signalFunnelChart"></canvas>
             </div>
         </div>
+
+        <div class="chart-container" style="margin-top: 20px;">
+            <div class="chart-title">Regime History Timeline</div>
+            <div class="chart-subtitle" style="margin-bottom: 20px;">Market conditions over time</div>
+            <div style="height: 300px;">
+                <canvas id="regimeTimelineChart"></canvas>
+            </div>
+        </div>
     </div>
 
-    <!-- Ticker Analysis Tab -->
     <div id="ticker-tab" class="tab-content">
         <div class="ticker-controls">
             <div class="control-group">
@@ -1362,7 +1416,6 @@
         </div>
 
         <div id="tickerAnalysisResults" style="display: none;">
-            <!-- Summary Metrics -->
             <div class="ticker-metrics-grid">
                 <div class="ticker-metric-card">
                     <div class="ticker-metric-label">Session Return</div>
@@ -1396,7 +1449,6 @@
                 </div>
             </div>
 
-            <!-- Main Composite Chart -->
             <div class="chart-container">
                 <div class="chart-header">
                     <div class="chart-title" id="chartTitle">Intraday Price Action</div>
@@ -1405,7 +1457,6 @@
                 <div id="mainTickerChart" class="plotly-chart"></div>
             </div>
 
-            <!-- Secondary Charts -->
             <div class="secondary-charts">
                 <div class="chart-container">
                     <div class="chart-header">
@@ -1449,21 +1500,20 @@
         let exitReasonsChart;
         let pnlDistributionChart;
         let longShortChart;
-        let kellySizingChart;
-        let regimeChart;
+        let confidenceDistChart;
+        let regimeTimelineChart;
         let signalFunnelChart;
         let allTrades = [];
         let showingAllTrades = false;
         let signalAnalytics = null;
         let tradeAnalytics = null;
+        let regimeHistory = null;
         
-        // Ticker analysis variables
         let availableTickers = [];
         let availableDates = {};
         let selectedTicker = null;
         let currentHighlightIndex = -1;
 
-        // Main tab switching
         function switchMainTab(tabName) {
             document.querySelectorAll('.main-tab').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -1471,18 +1521,15 @@
             event.target.classList.add('active');
             document.getElementById(`${tabName}-tab`).classList.add('active');
             
-            // Render strategy analytics charts when tab is activated
             if (tabName === 'analytics' && signalAnalytics) {
-                renderStrategyAnalytics(signalAnalytics);
+                renderStrategyAnalytics(signalAnalytics, regimeHistory);
             }
             
-            // Initialize ticker analysis when tab is activated
             if (tabName === 'ticker') {
                 initializeTickerAnalysis();
             }
         }
 
-        // Trade tab switching
         function switchTradeTab(tabName) {
             document.querySelectorAll('.trades-container .tab').forEach(tab => tab.classList.remove('active'));
             event.target.classList.add('active');
@@ -1499,21 +1546,22 @@
             }
         }
 
-        // Performance dashboard functions
         async function loadData() {
             try {
-                const [equityCurve, trades, metrics, state, positions, signalAnalyticsData, tradeAnalyticsData] = await Promise.all([
+                const [equityCurve, trades, metrics, state, positions, signalAnalyticsData, tradeAnalyticsData, regimeHistoryData] = await Promise.all([
                     fetchCSV('data/equity_curve.csv'),
                     fetchCSV('data/trades.csv'),
                     fetch('data/metrics.json').then(r => r.json()).catch(() => ({})),
                     fetch('data/state.json').then(r => r.json()).catch(() => ({cash: 10000, step_count: 0})),
                     fetch('data/positions.json').then(r => r.json()).catch(() => ({})),
                     fetch('data/signal_analytics.json').then(r => r.json()).catch(() => null),
-                    fetch('data/trade_analytics.json').then(r => r.json()).catch(() => null)
+                    fetch('data/trade_analytics.json').then(r => r.json()).catch(() => null),
+                    fetchCSV('data/regime_history.csv')
                 ]);
 
                 signalAnalytics = signalAnalyticsData;
                 tradeAnalytics = tradeAnalyticsData;
+                regimeHistory = regimeHistoryData;
 
                 updateMetrics(equityCurve, trades, metrics);
                 updateSignalExecutionMetrics(signalAnalyticsData);
@@ -1545,10 +1593,8 @@
         function updateSignalExecutionMetrics(data) {
             if (!data) return;
 
-            // Update execution rate metric card
             document.getElementById('executionRate').textContent = data.execution_rate.toFixed(1) + '%';
 
-            // Update signal bars
             document.getElementById('executedPct').textContent = data.execution_rate.toFixed(1) + '%';
             document.getElementById('executedBar').style.width = data.execution_rate + '%';
 
@@ -1561,7 +1607,6 @@
             document.getElementById('trendVetoBlockPct').textContent = data.trend_veto_rate.toFixed(1) + '%';
             document.getElementById('trendVetoBar').style.width = data.trend_veto_rate + '%';
 
-            // Update diagnostic stats
             document.getElementById('totalSignalsGenerated').textContent = data.total_signals_generated;
             document.getElementById('signalsExecutedCount').textContent = data.signals_executed;
             document.getElementById('avgConfidence').textContent = data.avg_combined_confidence.toFixed(2);
@@ -1571,7 +1616,6 @@
         function renderTradeAnalytics(analytics, trades) {
             if (!analytics || trades.length === 0) return;
 
-            // Update analytics stats
             document.getElementById('analyticsTotalTrades').textContent = analytics.total_trades;
             document.getElementById('analyticsWinRate').textContent = analytics.win_rate.toFixed(1) + '%';
             document.getElementById('analyticsAvgHoldTime').textContent = analytics.avg_hold_time.toFixed(1);
@@ -1586,7 +1630,6 @@
             document.getElementById('analyticsTotalCommissions').textContent = '$' + analytics.total_commissions.toFixed(2);
             document.getElementById('analyticsAvgCommission').textContent = '$' + analytics.avg_commission_per_trade.toFixed(2);
 
-            // P&L Distribution Chart
             const pnls = trades.map(t => t.pnl).sort((a, b) => a - b);
             const bins = 20;
             const minPnl = Math.min(...pnls);
@@ -1644,7 +1687,6 @@
                 }
             });
 
-            // Long vs Short Performance
             const longTrades = trades.filter(t => t.side === 'Long');
             const shortTrades = trades.filter(t => t.side === 'Short');
             
@@ -1707,18 +1749,206 @@
             });
         }
 
-        function renderStrategyAnalytics(data) {
+        function renderCurrentRegime(regime) {
+            const badgeContainer = document.getElementById('regimeBadgeContainer');
+            const statsContainer = document.getElementById('regimeStats');
+            
+            const regimeName = regime.regime.replace('_', ' ');
+            const regimeClass = regime.regime.toLowerCase().replace('_', '-');
+            
+            badgeContainer.innerHTML = `<div class="regime-badge ${regimeClass}">${regimeName}</div>`;
+            
+            statsContainer.innerHTML = `
+                <div class="regime-stat-row">
+                    <span class="regime-stat-label">Trend Strength (μ)</span>
+                    <span class="regime-stat-value">${regime.mu.toFixed(4)}</span>
+                </div>
+                <div class="regime-stat-row">
+                    <span class="regime-stat-label">Volatility (σ)</span>
+                    <span class="regime-stat-value">${regime.sigma.toFixed(4)}</span>
+                </div>
+                <div class="regime-stat-row">
+                    <span class="regime-stat-label">Delta</span>
+                    <span class="regime-stat-value">${regime.delta.toFixed(4)}</span>
+                </div>
+                <div class="regime-stat-row">
+                    <span class="regime-stat-label">Dispersion</span>
+                    <span class="regime-stat-value">${regime.dispersion.toFixed(4)}</span>
+                </div>
+            `;
+        }
+
+        function renderRegimeTimeline(regimeData) {
+            if (!regimeData || regimeData.length === 0) return;
+            
+            const dates = regimeData.map(r => r.date);
+            const regimes = regimeData.map(r => r.regime);
+            
+            const regimeMap = {
+                'STRONG_BULL': 2,
+                'WEAK_BULL': 1,
+                'NEUTRAL': 0,
+                'WEAK_BEAR': -1,
+                'STRONG_BEAR': -2
+            };
+            
+            const regimeValues = regimes.map(r => regimeMap[r] || 0);
+            
+            const colors = regimes.map(r => {
+                switch(r) {
+                    case 'STRONG_BULL': return 'rgba(0, 212, 170, 0.8)';
+                    case 'WEAK_BULL': return 'rgba(0, 212, 170, 0.4)';
+                    case 'NEUTRAL': return 'rgba(255, 159, 67, 0.6)';
+                    case 'WEAK_BEAR': return 'rgba(255, 71, 87, 0.4)';
+                    case 'STRONG_BEAR': return 'rgba(255, 71, 87, 0.8)';
+                    default: return 'rgba(128, 128, 128, 0.5)';
+                }
+            });
+            
+            if (regimeTimelineChart) regimeTimelineChart.destroy();
+            const ctx = document.getElementById('regimeTimelineChart').getContext('2d');
+            regimeTimelineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Market Regime',
+                        data: regimeValues,
+                        backgroundColor: colors,
+                        borderColor: colors,
+                        borderWidth: 3,
+                        pointBackgroundColor: colors,
+                        pointBorderColor: colors,
+                        pointRadius: 8,
+                        pointHoverRadius: 12,
+                        stepped: true,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1a1a1a',
+                            titleColor: '#ffffff',
+                            bodyColor: '#e0e0e0',
+                            borderColor: '#2a2a2a',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    return regimes[context.dataIndex].replace('_', ' ');
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            grid: { color: '#1a1a1a' },
+                            ticks: { color: '#808080', maxTicksLimit: 8 }
+                        },
+                        y: { 
+                            grid: { color: '#1a1a1a' },
+                            ticks: { 
+                                color: '#808080',
+                                callback: function(value) {
+                                    const labels = {
+                                        2: 'Strong Bull',
+                                        1: 'Weak Bull',
+                                        0: 'Neutral',
+                                        '-1': 'Weak Bear',
+                                        '-2': 'Strong Bear'
+                                    };
+                                    return labels[value] || '';
+                                }
+                            },
+                            min: -2.5,
+                            max: 2.5
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderStrategyAnalytics(data, regimeData) {
             if (!data) return;
 
-            // Update strategy metrics
-            document.getElementById('strategyTgaConfidence').textContent = data.avg_tga_confidence.toFixed(2);
-            document.getElementById('strategyLstmConfidence').textContent = data.avg_lstm_confidence.toFixed(2);
-            document.getElementById('strategyCombinedConfidence').textContent = data.avg_combined_confidence.toFixed(2);
+            document.getElementById('strategyTgaConfidence').textContent = data.avg_tga_confidence.toFixed(3);
+            document.getElementById('strategyLstmConfidence').textContent = data.avg_lstm_confidence.toFixed(3);
+            document.getElementById('strategyCombinedConfidence').textContent = data.avg_combined_confidence.toFixed(3);
             document.getElementById('strategyLongShortRatio').textContent = data.long_short_ratio.toFixed(2);
             document.getElementById('strategyLongSignals').textContent = data.long_signals;
             document.getElementById('strategyShortSignals').textContent = data.short_signals;
 
-            // Signal Funnel Chart
+            if (regimeData && regimeData.length > 0) {
+                const currentRegime = regimeData[regimeData.length - 1];
+                renderCurrentRegime(currentRegime);
+                renderRegimeTimeline(regimeData);
+            }
+
+            if (confidenceDistChart) confidenceDistChart.destroy();
+            const ctx1 = document.getElementById('confidenceDistChart').getContext('2d');
+            confidenceDistChart = new Chart(ctx1, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Avg Confidence',
+                        data: [
+                            { x: 0, y: data.avg_tga_confidence },
+                            { x: 1, y: data.avg_lstm_confidence }
+                        ],
+                        backgroundColor: ['rgba(0, 168, 255, 0.7)', 'rgba(0, 212, 170, 0.7)'],
+                        pointRadius: 12,
+                        pointHoverRadius: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1a1a1a',
+                            titleColor: '#ffffff',
+                            bodyColor: '#e0e0e0',
+                            borderColor: '#2a2a2a',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const labels = ['TGA', 'LSTM'];
+                                    return labels[context.dataIndex] + ': ' + context.parsed.y.toFixed(3);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            grid: { color: '#1a1a1a' },
+                            ticks: { 
+                                color: '#808080',
+                                callback: function(value) {
+                                    return ['TGA', 'LSTM'][value] || '';
+                                }
+                            },
+                            min: -0.5,
+                            max: 1.5
+                        },
+                        y: { 
+                            grid: { color: '#1a1a1a' },
+                            ticks: { color: '#808080' },
+                            min: 0,
+                            max: 1,
+                            title: {
+                                display: true,
+                                text: 'Confidence',
+                                color: '#808080'
+                            }
+                        }
+                    }
+                }
+            });
+
             const funnelData = [
                 data.total_signals_generated,
                 data.total_signals_generated - data.blocked_by_uncertainty,
@@ -1861,10 +2091,15 @@
                 return;
             }
             
+            // FIXED: First pass - calculate total portfolio value
+            positionsArray.forEach(([ticker, position]) => {
+                portfolioValue += position.shares * position.entry_price;
+            });
+            
+            // FIXED: Now calculate percentages based on total portfolio value
             const positionsHTML = positionsArray.map(([ticker, position]) => {
                 const positionValue = Math.abs(position.shares * position.entry_price);
-                portfolioValue += position.shares * position.entry_price;
-                const percentage = (positionValue / (cash + positionValue) * 100).toFixed(1);
+                const percentage = (positionValue / portfolioValue * 100).toFixed(1);
                 
                 return `
                     <div class="position-item">
@@ -2121,12 +2356,8 @@
             document.getElementById('exitReasonsLegend').innerHTML = legendHTML;
         }
 
-        // ============================================================
-        // TICKER ANALYSIS FUNCTIONS
-        // ============================================================
-
         async function initializeTickerAnalysis() {
-            if (availableTickers.length > 0) return; // Already initialized
+            if (availableTickers.length > 0) return;
             
             try {
                 document.getElementById('tickerCount').textContent = 'Scanning market data...';
@@ -2163,7 +2394,7 @@
             try {
                 const testResponse = await fetch('data/market_data/AAPL/2026-01-28.csv.gz');
                 if (testResponse.ok) {
-                    return ['A', 'AAPL', 'ABBV', 'ABC', 'ABNB', 'ABT', 'ACGL', 'ACN', 'ADBE', 'ADI', 'ADM', 'ADP', 'ADSK', 'AEE', 'AEP', 'AES', 'AFL', 'AIG', 'AIZ', 'AJG', 'AKAM', 'ALB', 'ALGN', 'ALL', 'ALLE', 'AMAT', 'AMCR', 'AMD', 'AME', 'AMGN', 'AMP', 'AMT', 'AMZN', 'ANET', 'ANSS', 'AON', 'AOS', 'APA', 'APD', 'APH', 'APTV', 'ARE', 'ATO', 'AVB', 'AVGO', 'AVY', 'AWK', 'AXON', 'AXP', 'AZO', 'BA', 'BAC', 'BALL', 'BAX', 'BBWI', 'BBY', 'BDX', 'BEN', 'BF-B', 'BG', 'BIIB', 'BK', 'BKNG', 'BKR', 'BLDR', 'BLK', 'BMY', 'BR', 'BRK-B', 'BRO', 'BSX', 'BWA', 'BX', 'BXP', 'C', 'CAG', 'CAH', 'CARR', 'CAT', 'CB', 'CBOE', 'CBRE', 'CCI', 'CCL', 'CDNS', 'CDW', 'CE', 'CEG', 'CF', 'CFG', 'CHD', 'CHRW', 'CHTR', 'CI', 'CINF', 'CL', 'CLX', 'CMA', 'CMCSA', 'CME', 'CMG', 'CMI', 'CMS', 'CNC', 'CNP', 'COF', 'COO', 'COP', 'COR', 'COST', 'CPAY', 'CPB', 'CPRT', 'CPT', 'CRL', 'CRM', 'CRWD', 'CSCO', 'CSGP', 'CSX', 'CTAS', 'CTLT', 'CTRA', 'CTSH', 'CTVA', 'CVS', 'CVX', 'CZR', 'D', 'DAL', 'DAY', 'DD', 'DE', 'DECK', 'DFS', 'DG', 'DGX', 'DHI', 'DHR', 'DIS', 'DLR', 'DLTR', 'DOC', 'DOV', 'DOW', 'DPZ', 'DRI', 'DTE', 'DUK', 'DVA', 'DVN', 'DXCM', 'EA', 'EBAY', 'ECL', 'ED', 'EFX', 'EG', 'EIX', 'EL', 'ELV', 'EMN', 'EMR', 'ENPH', 'EOG', 'EPAM', 'EQIX', 'EQR', 'EQT', 'ERIE', 'ES', 'ESS', 'ETN', 'ETR', 'EVRG', 'EW', 'EXC', 'EXPD', 'EXPE', 'EXR', 'F', 'FANG', 'FAST', 'FCX', 'FDS', 'FDX', 'FE', 'FFIV', 'FI', 'FICO', 'FIS', 'FITB', 'FMC', 'FOX', 'FOXA', 'FRT', 'FSLR', 'FTNT', 'FTV', 'GD', 'GDDY', 'GE', 'GEHC', 'GEN', 'GEV', 'GILD', 'GIS', 'GL', 'GLW', 'GM', 'GNRC', 'GOOG', 'GOOGL', 'GPC', 'GPN', 'GRMN', 'GS', 'GWW', 'HAL', 'HAS', 'HBAN', 'HCA', 'HD', 'HES', 'HIG', 'HII', 'HLT', 'HOLX', 'HON', 'HPE', 'HPQ', 'HRL', 'HSIC', 'HST', 'HSY', 'HUBB', 'HUM', 'HWM', 'IBM', 'ICE', 'IDXX', 'IEX', 'IFF', 'INCY', 'INTC', 'INTU', 'INVH', 'IP', 'IPG', 'IQV', 'IR', 'IRM', 'ISRG', 'IT', 'ITW', 'IVZ', 'J', 'JBHT', 'JBL', 'JCI', 'JKHY', 'JNJ', 'JNPR', 'JPM', 'K', 'KDP', 'KEY', 'KEYS', 'KHC', 'KIM', 'KLAC', 'KMB', 'KMI', 'KMX', 'KO', 'KR', 'KVUE', 'L', 'LDOS', 'LEN', 'LH', 'LHX', 'LIN', 'LKQ', 'LLY', 'LMT', 'LNT', 'LOW', 'LRCX', 'LULU', 'LUV', 'LVS', 'LW', 'LYB', 'LYV', 'MA', 'MAA', 'MAR', 'MAS', 'MCD', 'MCHP', 'MCK', 'MCO', 'MDLZ', 'MDT', 'MET', 'META', 'MGM', 'MHK', 'MKC', 'MKTX', 'MLM', 'MMC', 'MMM', 'MNST', 'MO', 'MOH', 'MOS', 'MPC', 'MPWR', 'MRK', 'MRNA', 'MRO', 'MS', 'MSCI', 'MSFT', 'MSI', 'MTB', 'MTCH', 'MTD', 'MU', 'NCLH', 'NDAQ', 'NDSN', 'NEE', 'NEM', 'NFLX', 'NI', 'NKE', 'NOC', 'NOW', 'NRG', 'NSC', 'NTAP', 'NTRS', 'NUE', 'NVDA', 'NVR', 'NWS', 'NWSA', 'NXPI', 'O', 'ODFL', 'OKE', 'OMC', 'ON', 'ORCL', 'ORLY', 'OTIS', 'OXY', 'PANW', 'PARA', 'PAYC', 'PAYX', 'PCAR', 'PCG', 'PEG', 'PEP', 'PFE', 'PFG', 'PG', 'PGR', 'PH', 'PHM', 'PKG', 'PLD', 'PLTR', 'PM', 'PNC', 'PNR', 'PNW', 'PODD', 'POOL', 'PPG', 'PPL', 'PRU', 'PSA', 'PSX', 'PTC', 'PWR', 'PYPL', 'QCOM', 'QRVO', 'RCL', 'REG', 'REGN', 'RF', 'RJF', 'RL', 'RMD', 'ROK', 'ROL', 'ROP', 'ROST', 'RSG', 'RTX', 'RVTY', 'SBAC', 'SBUX', 'SCHW', 'SHW', 'SJM', 'SLB', 'SMCI', 'SNA', 'SNPS', 'SO', 'SOLV', 'SPG', 'SPGI', 'SRE', 'STE', 'STLD', 'STT', 'STX', 'STZ', 'SWK', 'SWKS', 'SYF', 'SYK', 'SYY', 'T', 'TAP', 'TDG', 'TDY', 'TECH', 'TEL', 'TER', 'TFC', 'TFX', 'TGT', 'TJX', 'TMO', 'TMUS', 'TPR', 'TRGP', 'TRMB', 'TROW', 'TRV', 'TSCO', 'TSLA', 'TSN', 'TT', 'TTWO', 'TXN', 'TXT', 'TYL', 'UAL', 'UBER', 'UDR', 'UHS', 'ULTA', 'UNH', 'UNP', 'UPS', 'URI', 'USB', 'V', 'VICI', 'VLO', 'VLTO', 'VMC', 'VRSK', 'VRSN', 'VRTX', 'VST', 'VTR', 'VTRS', 'VZ', 'WAB', 'WAT', 'WBA', 'WBD', 'WDC', 'WEC', 'WELL', 'WFC', 'WM', 'WMB', 'WMT', 'WRB', 'WST', 'WTW', 'WY', 'WYNN', 'XEL', 'XOM', 'XYL', 'YUM', 'ZBH', 'ZBRA', 'ZTS'];
+                    return ['A', 'AAPL', 'ABBV', 'ABC', 'ABNB', 'ABT', 'ACGL', 'ACN', 'ADBE', 'ADI', 'ADM', 'ADP', 'ADSK', 'AEE', 'AEP', 'AES', 'AFL', 'AIG', 'AIZ', 'AJG', 'AKAM', 'ALB', 'ALGN', 'ALL', 'ALLE', 'AMAT', 'AMCR', 'AMD', 'AME', 'AMGN', 'AMP', 'AMT', 'AMZN', 'ANET', 'ANSS', 'AON', 'AOS', 'APA', 'APD', 'APH', 'APTV', 'ARE', 'ATO', 'AVB', 'AVGO', 'AVY', 'AWK', 'AXON', 'AXP', 'AZO', 'BA', 'BAC', 'BALL', 'BAX', 'BBWI', 'BBY', 'BDX', 'BEN', 'BF-B', 'BG', 'BIIB', 'BK', 'BKNG', 'BKR', 'BLDR', 'BLK', 'BMY', 'BR', 'BRK-B', 'BRO', 'BSX', 'BWA', 'BX', 'BXP', 'C', 'CAG', 'CAH', 'CARR', 'CAT', 'CB', 'CBOE', 'CBRE', 'CCI', 'CCL', 'CDNS', 'CDW', 'CE', 'CEG', 'CF', 'CFG', 'CHD', 'CHRW', 'CHTR', 'CI', 'CINF', 'CL', 'CLX', 'CMA', 'CMCSA', 'CME', 'CMG', 'CMI', 'CMS', 'CNC', 'CNP', 'COF', 'COO', 'COP', 'COR', 'COST', 'CPAY', 'CPB', 'CPRT', 'CPT', 'CRL', 'CRM', 'CRWD', 'CSCO', 'CSGP', 'CSX', 'CTAS', 'CTLT', 'CTRA', 'CTSH', 'CTVA', 'CVS', 'CVX', 'CZR', 'D', 'DAL', 'DAY', 'DD', 'DE', 'DECK', 'DFS', 'DG', 'DGX', 'DHI', 'DHR', 'DIS', 'DLR', 'DLTR', 'DOC', 'DOV', 'DOW', 'DPZ', 'DRI', 'DTE', 'DUK', 'DVA', 'DVN', 'DXCM', 'EA', 'EBAY', 'ECL', 'ED', 'EFX', 'EG', 'EIX', 'EL', 'ELV', 'EMN', 'EMR', 'ENPH', 'EOG', 'EPAM', 'EQIX', 'EQR', 'EQT', 'ERIE', 'ES', 'ESS', 'ETN', 'ETR', 'EVRG', 'EW', 'EXC', 'EXPD', 'EXPE', 'EXR', 'F', 'FANG', 'FAST', 'FCX', 'FDS', 'FDX', 'FE', 'FFIV', 'FI', 'FICO', 'FIS', 'FITB', 'FMC', 'FOX', 'FOXA', 'FRT', 'FSLR', 'FTNT', 'FTV', 'GD', 'GDDY', 'GE', 'GEHC', 'GEN', 'GEV', 'GILD', 'GIS', 'GL', 'GLW', 'GM', 'GNRC', 'GOOG', 'GOOGL', 'GPC', 'GPN', 'GRMN', 'GS', 'GWW', 'HAL', 'HAS', 'HBAN', 'HCA', 'HD', 'HES', 'HIG', 'HII', 'HLT', 'HOLX', 'HON', 'HPE', 'HPQ', 'HRL', 'HSIC', 'HST', 'HSY', 'HUBB', 'HUM', 'HWM', 'IBM', 'ICE', 'IDXX', 'IEX', 'IFF', 'INCY', 'INTC', 'INTU', 'INVH', 'IP', 'IPG', 'IQV', 'IR', 'IRM', 'ISRG', 'IT', 'ITW', 'IVZ', 'J', 'JBHT', 'JBL', 'JCI', 'JKHY', 'JNJ', 'JNPR', 'JPM', 'K', 'KDP', 'KEY', 'KEYS', 'KHC', 'KIM', 'KLAC', 'KMB', 'KMI', 'KMX', 'KO', 'KR', 'KVUE', 'L', 'LDOS', 'LEN', 'LH', 'LHX', 'LIN', 'LKQ', 'LLY', 'LMT', 'LNT', 'LOW', 'LRCX', 'LULU', 'LUV', 'LVS', 'LW', 'LYB', 'LYV', 'MA', 'MAA', 'MAR', 'MAS', 'MCD', 'MCHP', 'MCK', 'MCO', 'MDLZ', 'MDT', 'MET', 'META', 'MGM', 'MHK', 'MKC', 'MKTX', 'MLM', 'MMC', 'MMM', 'MNST', 'MO', 'MOH', 'MOS', 'MPC', 'MPWR', 'MRK', 'MRNA', 'MRO', 'MS', 'MSCI', 'MSFT', 'MSI', 'MTB', 'MTCH', 'MTD', 'MU', 'NCLH', 'NDAQ', 'NDSN', 'NEE', 'NEM', 'NFLX', 'NI', 'NKE', 'NOC', 'NOW', 'NRG', 'NSC', 'NTAP', 'NTRS', 'NUE', 'NVDA', 'NVR', 'NWS', 'NWSA', 'NXPI', 'O', 'ODFL', 'OKE', 'OMC', 'ON', 'ORCL', 'ORLY', 'OTIS', 'OXY', 'PANW', 'PARA', 'PAYC', 'PAYX', 'PCAR', 'PCG', 'PEG', 'PEP', 'PFE', 'PFG', 'PG', 'PGR', 'PH', 'PHM', 'PKG', 'PLD', 'PM', 'PNC', 'PNR', 'PNW', 'PODD', 'POOL', 'PPG', 'PPL', 'PRU', 'PSA', 'PSX', 'PTC', 'PWR', 'PYPL', 'QCOM', 'QRVO', 'RCL', 'REG', 'REGN', 'RF', 'RJF', 'RL', 'RMD', 'ROK', 'ROL', 'ROP', 'ROST', 'RSG', 'RTX', 'RVTY', 'SBAC', 'SBUX', 'SCHW', 'SHW', 'SJM', 'SLB', 'SMCI', 'SNA', 'SNPS', 'SO', 'SOLV', 'SPG', 'SPGI', 'SRE', 'STE', 'STLD', 'STT', 'STX', 'STZ', 'SWK', 'SWKS', 'SYF', 'SYK', 'SYY', 'T', 'TAP', 'TDG', 'TDY', 'TECH', 'TEL', 'TER', 'TFC', 'TFX', 'TGT', 'TJX', 'TMO', 'TMUS', 'TPR', 'TRGP', 'TRMB', 'TROW', 'TRV', 'TSCO', 'TSLA', 'TSN', 'TT', 'TTWO', 'TXN', 'TXT', 'TYL', 'UAL', 'UBER', 'UDR', 'UHS', 'ULTA', 'UNH', 'UNP', 'UPS', 'URI', 'USB', 'V', 'VICI', 'VLO', 'VLTO', 'VMC', 'VRSK', 'VRSN', 'VRTX', 'VST', 'VTR', 'VTRS', 'VZ', 'WAB', 'WAT', 'WBA', 'WBD', 'WDC', 'WEC', 'WELL', 'WFC', 'WM', 'WMB', 'WMT', 'WRB', 'WST', 'WTW', 'WY', 'WYNN', 'XEL', 'XOM', 'XYL', 'YUM', 'ZBH', 'ZBRA', 'ZTS'];
                 }
             } catch (e) {
                 console.error('Error testing ticker structure:', e);
