@@ -1,15 +1,15 @@
 {
-  "total_signals_generated": 6,
-  "signals_executed": 3,
-  "execution_rate": 50.0,
-  "uncertainty_block_rate": 50.0,
+  "total_signals_generated": 32,
+  "signals_executed": 26,
+  "execution_rate": 81.25,
+  "uncertainty_block_rate": 12.5,
   "confidence_block_rate": 0.0,
   "trend_veto_rate": 0.0,
-  "avg_tga_confidence": 0.561,
-  "avg_lstm_confidence": 0.889,
-  "avg_combined_confidence": 0.762,
-  "avg_kelly_fraction": 0.419,
-  "long_signals": 2,
-  "short_signals": 4,
-  "long_short_ratio": 0.5
+  "avg_tga_confidence": 0.593,
+  "avg_lstm_confidence": 0.95,
+  "avg_combined_confidence": 0.824,
+  "avg_kelly_fraction": 0.518,
+  "long_signals": 31,
+  "short_signals": 1,
+  "long_short_ratio": 31.0
 }

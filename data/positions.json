@@ -1,23 +1,37 @@
 {
-  "PLTR": {
-    "shares": 8.35,
-    "entry_price": 129.16,
-    "entry_date": "2026-02-12",
+  "APD": {
+    "shares": 4.81,
+    "entry_price": 279.8,
+    "entry_date": "2026-02-13",
     "signal": 1,
     "side": 1
   },
-  "SBAC": {
-    "shares": -3.36,
-    "entry_price": 199.25,
-    "entry_date": "2026-02-12",
-    "signal": -1,
-    "side": -1
+  "AVGO": {
+    "shares": 3.64,
+    "entry_price": 325.24,
+    "entry_date": "2026-02-13",
+    "signal": 1,
+    "side": 1
   },
-  "TJX": {
-    "shares": -5.6,
-    "entry_price": 154.15,
-    "entry_date": "2026-02-12",
-    "signal": -1,
-    "side": -1
+  "AXON": {
+    "shares": 2.6,
+    "entry_price": 429.76,
+    "entry_date": "2026-02-13",
+    "signal": 1,
+    "side": 1
+  },
+  "BF-B": {
+    "shares": 19.56,
+    "entry_price": 29.96,
+    "entry_date": "2026-02-13",
+    "signal": 1,
+    "side": 1
+  },
+  "BLDR": {
+    "shares": 11.31,
+    "entry_price": 114.75,
+    "entry_date": "2026-02-13",
+    "signal": 1,
+    "side": 1
   }
 }
