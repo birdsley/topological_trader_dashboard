@@ -1,36 +1,36 @@
 {
-  "APD": {
-    "shares": 4.81,
-    "entry_price": 279.8,
-    "entry_date": "2026-02-13",
+  "ANET": {
+    "shares": 7.55,
+    "entry_price": 139.57,
+    "entry_date": "2026-02-18",
     "signal": 1,
     "side": 1
   },
-  "AVGO": {
-    "shares": 3.64,
-    "entry_price": 325.24,
-    "entry_date": "2026-02-13",
+  "BMY": {
+    "shares": 21.07,
+    "entry_price": 59.74,
+    "entry_date": "2026-02-18",
     "signal": 1,
     "side": 1
   },
-  "AXON": {
-    "shares": 2.6,
-    "entry_price": 429.76,
-    "entry_date": "2026-02-13",
+  "CZR": {
+    "shares": -40.73,
+    "entry_price": 21.42,
+    "entry_date": "2026-02-18",
+    "signal": -1,
+    "side": -1
+  },
+  "DE": {
+    "shares": 2.12,
+    "entry_price": 593.39,
+    "entry_date": "2026-02-18",
     "signal": 1,
     "side": 1
   },
-  "BF-B": {
-    "shares": 19.56,
-    "entry_price": 29.96,
-    "entry_date": "2026-02-13",
-    "signal": 1,
-    "side": 1
-  },
-  "BLDR": {
-    "shares": 11.31,
-    "entry_price": 114.75,
-    "entry_date": "2026-02-13",
+  "DRI": {
+    "shares": 5.82,
+    "entry_price": 216.45,
+    "entry_date": "2026-02-18",
     "signal": 1,
     "side": 1
   }
