@@ -1,25 +1,4 @@
 {
-  "ANET": {
-    "shares": 7.55,
-    "entry_price": 139.57,
-    "entry_date": "2026-02-18",
-    "signal": 1,
-    "side": 1
-  },
-  "BMY": {
-    "shares": 21.07,
-    "entry_price": 59.74,
-    "entry_date": "2026-02-18",
-    "signal": 1,
-    "side": 1
-  },
-  "CZR": {
-    "shares": -40.73,
-    "entry_price": 21.42,
-    "entry_date": "2026-02-18",
-    "signal": -1,
-    "side": -1
-  },
   "DE": {
     "shares": 2.12,
     "entry_price": 593.39,
@@ -27,10 +6,31 @@
     "signal": 1,
     "side": 1
   },
-  "DRI": {
-    "shares": 5.82,
-    "entry_price": 216.45,
-    "entry_date": "2026-02-18",
+  "ALL": {
+    "shares": 6.4,
+    "entry_price": 203.26,
+    "entry_date": "2026-02-19",
+    "signal": 1,
+    "side": 1
+  },
+  "BKNG": {
+    "shares": 0.18,
+    "entry_price": 4008.25,
+    "entry_date": "2026-02-19",
+    "signal": 1,
+    "side": 1
+  },
+  "BX": {
+    "shares": 11.03,
+    "entry_price": 125.79,
+    "entry_date": "2026-02-19",
+    "signal": 1,
+    "side": 1
+  },
+  "COF": {
+    "shares": 6.33,
+    "entry_price": 205.1,
+    "entry_date": "2026-02-19",
     "signal": 1,
     "side": 1
   }
