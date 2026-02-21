@@ -6,20 +6,6 @@
     "signal": 1,
     "side": 1
   },
-  "ALL": {
-    "shares": 6.4,
-    "entry_price": 203.26,
-    "entry_date": "2026-02-19",
-    "signal": 1,
-    "side": 1
-  },
-  "BKNG": {
-    "shares": 0.18,
-    "entry_price": 4008.25,
-    "entry_date": "2026-02-19",
-    "signal": 1,
-    "side": 1
-  },
   "BX": {
     "shares": 11.03,
     "entry_price": 125.79,
@@ -27,11 +13,25 @@
     "signal": 1,
     "side": 1
   },
-  "COF": {
-    "shares": 6.33,
-    "entry_price": 205.1,
-    "entry_date": "2026-02-19",
-    "signal": 1,
-    "side": 1
+  "EBAY": {
+    "shares": -8.47,
+    "entry_price": 88.05,
+    "entry_date": "2026-02-20",
+    "signal": -1,
+    "side": -1
+  },
+  "EXE": {
+    "shares": -8.68,
+    "entry_price": 108.04,
+    "entry_date": "2026-02-20",
+    "signal": -1,
+    "side": -1
+  },
+  "EXR": {
+    "shares": -6.39,
+    "entry_price": 152.72,
+    "entry_date": "2026-02-20",
+    "signal": -1,
+    "side": -1
   }
 }
