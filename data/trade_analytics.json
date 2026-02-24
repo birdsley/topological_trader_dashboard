@@ -1,22 +1,22 @@
 {
-  "total_trades": 61,
-  "winning_trades": 33,
-  "losing_trades": 28,
-  "win_rate": 54.1,
-  "avg_hold_time": 1.72,
-  "avg_win": 32.68,
-  "avg_loss": 23.97,
-  "win_loss_ratio": 1.36,
-  "profit_factor": 1.61,
+  "total_trades": 63,
+  "winning_trades": 34,
+  "losing_trades": 29,
+  "win_rate": 53.97,
+  "avg_hold_time": 1.7,
+  "avg_win": 32.1,
+  "avg_loss": 24.16,
+  "win_loss_ratio": 1.33,
+  "profit_factor": 1.56,
   "max_win": 361.75,
   "max_loss": -68.9,
   "exit_reason_breakdown": {
-    "Residual Reversion": 42,
+    "Residual Reversion": 44,
     "ATR Stop": 16,
     "Time": 3
   },
   "side_breakdown": {
-    "Long": 44,
+    "Long": 46,
     "Short": 17
   },
   "avg_commission_per_trade": 0,

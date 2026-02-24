@@ -13,13 +13,6 @@
     "signal": -1,
     "side": -1
   },
-  "ACN": {
-    "shares": 6.48,
-    "entry_price": 201.22,
-    "entry_date": "2026-02-23",
-    "signal": 1,
-    "side": 1
-  },
   "ADBE": {
     "shares": 5.18,
     "entry_price": 246.73,
@@ -27,10 +20,17 @@
     "signal": 1,
     "side": 1
   },
-  "ADSK": {
-    "shares": 6.07,
-    "entry_price": 218.68,
-    "entry_date": "2026-02-23",
+  "APH": {
+    "shares": -5.78,
+    "entry_price": 151.47,
+    "entry_date": "2026-02-24",
+    "signal": -1,
+    "side": -1
+  },
+  "BALL": {
+    "shares": 17.35,
+    "entry_price": 66.53,
+    "entry_date": "2026-02-24",
     "signal": 1,
     "side": 1
   }
