@@ -1,18 +1,4 @@
 {
-  "EBAY": {
-    "shares": -8.47,
-    "entry_price": 88.05,
-    "entry_date": "2026-02-20",
-    "signal": -1,
-    "side": -1
-  },
-  "EXE": {
-    "shares": -8.68,
-    "entry_price": 108.04,
-    "entry_date": "2026-02-20",
-    "signal": -1,
-    "side": -1
-  },
   "ADBE": {
     "shares": 5.18,
     "entry_price": 246.73,
@@ -20,17 +6,31 @@
     "signal": 1,
     "side": 1
   },
-  "APH": {
-    "shares": -5.78,
-    "entry_price": 151.47,
-    "entry_date": "2026-02-24",
-    "signal": -1,
-    "side": -1
+  "AVY": {
+    "shares": 6.93,
+    "entry_price": 192.83,
+    "entry_date": "2026-02-25",
+    "signal": 1,
+    "side": 1
   },
-  "BALL": {
-    "shares": 17.35,
-    "entry_price": 66.53,
-    "entry_date": "2026-02-24",
+  "BF-B": {
+    "shares": 41.68,
+    "entry_price": 28.11,
+    "entry_date": "2026-02-25",
+    "signal": 1,
+    "side": 1
+  },
+  "BLDR": {
+    "shares": 13.3,
+    "entry_price": 102.65,
+    "entry_date": "2026-02-25",
+    "signal": 1,
+    "side": 1
+  },
+  "CSGP": {
+    "shares": 32.79,
+    "entry_price": 44.79,
+    "entry_date": "2026-02-25",
     "signal": 1,
     "side": 1
   }
