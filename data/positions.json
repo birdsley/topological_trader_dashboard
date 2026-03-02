@@ -6,32 +6,32 @@
     "signal": 1,
     "side": 1
   },
-  "A": {
-    "shares": 11.85,
-    "entry_price": 120.99,
-    "entry_date": "2026-02-26",
-    "signal": 1,
-    "side": 1
+  "APA": {
+    "shares": -28.47,
+    "entry_price": 30.36,
+    "entry_date": "2026-02-27",
+    "signal": -1,
+    "side": -1
   },
-  "AMD": {
-    "shares": 6.49,
-    "entry_price": 203.72,
-    "entry_date": "2026-02-26",
-    "signal": 1,
-    "side": 1
+  "CCI": {
+    "shares": -9.74,
+    "entry_price": 89.52,
+    "entry_date": "2026-02-27",
+    "signal": -1,
+    "side": -1
   },
-  "BDX": {
-    "shares": 7.84,
-    "entry_price": 176.7,
-    "entry_date": "2026-02-26",
-    "signal": 1,
-    "side": 1
+  "CHTR": {
+    "shares": -4.15,
+    "entry_price": 234.58,
+    "entry_date": "2026-02-27",
+    "signal": -1,
+    "side": -1
   },
-  "COIN": {
-    "shares": 7.85,
-    "entry_price": 181.1,
-    "entry_date": "2026-02-26",
-    "signal": 1,
-    "side": 1
+  "EBAY": {
+    "shares": -9.6,
+    "entry_price": 90.84,
+    "entry_date": "2026-02-27",
+    "signal": -1,
+    "side": -1
   }
 }
