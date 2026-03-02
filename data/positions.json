@@ -1,37 +1,37 @@
 {
-  "ADBE": {
-    "shares": 5.18,
-    "entry_price": 246.73,
-    "entry_date": "2026-02-23",
+  "APH": {
+    "shares": 12.89,
+    "entry_price": 135.19,
+    "entry_date": "2026-03-02",
     "signal": 1,
     "side": 1
   },
-  "APA": {
-    "shares": -28.47,
-    "entry_price": 30.36,
-    "entry_date": "2026-02-27",
-    "signal": -1,
-    "side": -1
+  "ARE": {
+    "shares": 30.12,
+    "entry_price": 52.64,
+    "entry_date": "2026-03-02",
+    "signal": 1,
+    "side": 1
   },
-  "CCI": {
-    "shares": -9.74,
-    "entry_price": 89.52,
-    "entry_date": "2026-02-27",
-    "signal": -1,
-    "side": -1
+  "BAX": {
+    "shares": 77.98,
+    "entry_price": 19.69,
+    "entry_date": "2026-03-02",
+    "signal": 1,
+    "side": 1
   },
-  "CHTR": {
-    "shares": -4.15,
-    "entry_price": 234.58,
-    "entry_date": "2026-02-27",
-    "signal": -1,
-    "side": -1
+  "CCL": {
+    "shares": 44.24,
+    "entry_price": 29.15,
+    "entry_date": "2026-03-02",
+    "signal": 1,
+    "side": 1
   },
-  "EBAY": {
-    "shares": -9.6,
-    "entry_price": 90.84,
-    "entry_date": "2026-02-27",
-    "signal": -1,
-    "side": -1
+  "DG": {
+    "shares": 10.52,
+    "entry_price": 152.65,
+    "entry_date": "2026-03-02",
+    "signal": 1,
+    "side": 1
   }
 }
