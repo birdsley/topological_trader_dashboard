@@ -1,36 +1,36 @@
 {
-  "APH": {
-    "shares": 12.89,
-    "entry_price": 135.19,
-    "entry_date": "2026-03-02",
+  "BF-B": {
+    "shares": 55.71,
+    "entry_price": 26.27,
+    "entry_date": "2026-03-04",
     "signal": 1,
     "side": 1
   },
-  "ARE": {
-    "shares": 30.12,
-    "entry_price": 52.64,
-    "entry_date": "2026-03-02",
+  "CLX": {
+    "shares": 10.94,
+    "entry_price": 117.45,
+    "entry_date": "2026-03-04",
     "signal": 1,
     "side": 1
   },
-  "BAX": {
-    "shares": 77.98,
-    "entry_price": 19.69,
-    "entry_date": "2026-03-02",
+  "COIN": {
+    "shares": -4.64,
+    "entry_price": 208.89,
+    "entry_date": "2026-03-04",
+    "signal": -1,
+    "side": -1
+  },
+  "DRI": {
+    "shares": 6.37,
+    "entry_price": 203.45,
+    "entry_date": "2026-03-04",
     "signal": 1,
     "side": 1
   },
-  "CCL": {
-    "shares": 44.24,
-    "entry_price": 29.15,
-    "entry_date": "2026-03-02",
-    "signal": 1,
-    "side": 1
-  },
-  "DG": {
-    "shares": 10.52,
-    "entry_price": 152.65,
-    "entry_date": "2026-03-02",
+  "LEN": {
+    "shares": 11.6,
+    "entry_price": 106.55,
+    "entry_date": "2026-03-04",
     "signal": 1,
     "side": 1
   }
