@@ -1,37 +1,37 @@
 {
-  "CAG": {
-    "shares": -39.19,
-    "entry_price": 19.02,
-    "entry_date": "2026-03-06",
-    "signal": -1,
-    "side": -1
+  "ACN": {
+    "shares": 6.03,
+    "entry_price": 209.4,
+    "entry_date": "2026-03-09",
+    "signal": 1,
+    "side": 1
   },
-  "CPB": {
-    "shares": -31.36,
-    "entry_price": 25.79,
-    "entry_date": "2026-03-06",
-    "signal": -1,
-    "side": -1
+  "AXON": {
+    "shares": 2.45,
+    "entry_price": 559.17,
+    "entry_date": "2026-03-09",
+    "signal": 1,
+    "side": 1
   },
-  "FIS": {
-    "shares": -15.93,
-    "entry_price": 51.48,
-    "entry_date": "2026-03-06",
-    "signal": -1,
-    "side": -1
+  "BF-B": {
+    "shares": 49.41,
+    "entry_price": 24.88,
+    "entry_date": "2026-03-09",
+    "signal": 1,
+    "side": 1
   },
-  "FOX": {
-    "shares": -14.92,
-    "entry_price": 54.3,
-    "entry_date": "2026-03-06",
-    "signal": -1,
-    "side": -1
+  "BKNG": {
+    "shares": 0.28,
+    "entry_price": 4441.58,
+    "entry_date": "2026-03-09",
+    "signal": 1,
+    "side": 1
   },
-  "FOXA": {
-    "shares": -13.55,
-    "entry_price": 59.77,
-    "entry_date": "2026-03-06",
-    "signal": -1,
-    "side": -1
+  "CHTR": {
+    "shares": 4.2,
+    "entry_price": 222.85,
+    "entry_date": "2026-03-09",
+    "signal": 1,
+    "side": 1
   }
 }

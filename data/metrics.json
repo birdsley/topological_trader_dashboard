@@ -1,6 +1,6 @@
 {
-  "sharpe": -2.61,
-  "sortino": -2.39,
+  "sharpe": -2.37,
+  "sortino": -2.15,
   "max_drawdown": -6.92,
-  "win_rate": 49.5
+  "win_rate": 51.0
 }
