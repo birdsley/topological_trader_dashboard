@@ -1,11 +1,4 @@
 {
-  "ACN": {
-    "shares": 6.03,
-    "entry_price": 209.4,
-    "entry_date": "2026-03-09",
-    "signal": 1,
-    "side": 1
-  },
   "AXON": {
     "shares": 2.45,
     "entry_price": 559.17,
@@ -13,25 +6,32 @@
     "signal": 1,
     "side": 1
   },
-  "BF-B": {
-    "shares": 49.41,
-    "entry_price": 24.88,
-    "entry_date": "2026-03-09",
-    "signal": 1,
-    "side": 1
+  "C": {
+    "shares": -7.5,
+    "entry_price": 108.95,
+    "entry_date": "2026-03-10",
+    "signal": -1,
+    "side": -1
   },
-  "BKNG": {
-    "shares": 0.28,
-    "entry_price": 4441.58,
-    "entry_date": "2026-03-09",
-    "signal": 1,
-    "side": 1
+  "EL": {
+    "shares": -8.47,
+    "entry_price": 94.25,
+    "entry_date": "2026-03-10",
+    "signal": -1,
+    "side": -1
   },
-  "CHTR": {
-    "shares": 4.2,
-    "entry_price": 222.85,
-    "entry_date": "2026-03-09",
-    "signal": 1,
-    "side": 1
+  "FCX": {
+    "shares": -13.66,
+    "entry_price": 62.39,
+    "entry_date": "2026-03-10",
+    "signal": -1,
+    "side": -1
+  },
+  "FSLR": {
+    "shares": -4.97,
+    "entry_price": 197.76,
+    "entry_date": "2026-03-10",
+    "signal": -1,
+    "side": -1
   }
 }
