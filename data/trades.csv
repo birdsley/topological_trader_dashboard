@@ -1,14 +1,14 @@
 ticker,side,entry_date,exit_date,entry_price,exit_price,shares,pnl,exit_reason
 ACN,Long,2026-03-09,2026-03-10,209.4,200.07,6,-56.3,ATR Stop
 BF-B,Long,2026-03-09,2026-03-10,24.88,25.39,49,24.95,Residual Reversion
-CHTR,Long,2026-03-09,2026-03-10,222.85,219.29,4,-15.0,Residual Reversion
-BKNG,Long,2026-03-09,2026-03-10,4441.58,4370.9,0,-20.04,Residual Reversion
+CHTR,Long,2026-03-09,2026-03-10,222.85,245.32,4,75.0,Residual Reversion
+BKNG,Long,2026-03-09,2026-03-10,4441.58,4456.91,0,40.04,Residual Reversion
 CAG,Short,2026-03-06,2026-03-09,19.02,18.66,-39,13.62,Residual Reversion
 FOXA,Short,2026-03-06,2026-03-09,59.77,59.27,-14,6.66,Residual Reversion
 CPB,Short,2026-03-06,2026-03-09,25.79,25.3,-31,15.52,Residual Reversion
 FOX,Short,2026-03-06,2026-03-09,54.3,54.05,-15,3.63,Residual Reversion
 FIS,Short,2026-03-06,2026-03-09,51.48,51.63,-16,-2.48,ATR Stop
-ALB,Long,2026-03-05,2026-03-06,163.96,162.26,11,-19.15,Residual Reversion
+ALB,Long,2026-03-05,2026-03-06,163.96,165.26,11,19.15,Residual Reversion
 CCL,Long,2026-03-05,2026-03-06,27.17,25.6,56,-87.51,ATR Stop
 CMI,Long,2026-03-05,2026-03-06,556.18,538.66,3,-46.96,ATR Stop
 AMCR,Long,2026-03-05,2026-03-06,43.7,43.27,37,-15.83,Residual Reversion
